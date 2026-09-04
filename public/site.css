@@ -519,7 +519,9 @@ em { color: var(--sky-dark); font-style: normal; }
 
 .finale {
   position: relative;
-  min-height: 82svh;
+  display: grid;
+  min-height: 64svh;
+  align-content: center;
   overflow: hidden;
   padding: clamp(7rem, 11vw, 11rem) var(--gutter);
   background: var(--ink-deep);
@@ -531,18 +533,18 @@ em { color: var(--sky-dark); font-style: normal; }
   position: absolute;
   z-index: -1;
   right: -12vw;
-  bottom: -23vw;
-  width: 65vw;
+  bottom: -25vw;
+  width: 56vw;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(191 222 225 / .22), transparent 65%);
+  background: radial-gradient(circle, rgb(191 222 225 / .18), transparent 65%);
 }
 
 .finale .section-label { color: var(--sand); }
 
 .finale h2 {
-  max-width: 15ch;
-  margin: 2.8rem 0 4rem;
+  max-width: 20ch;
+  margin: 2.4rem 0 2rem;
   font-size: var(--text-heading);
 }
 
@@ -980,7 +982,7 @@ footer p:last-child { justify-self: end; }
 
 .north-star-answer {
   max-width: 45rem;
-  margin: 0 0 4rem;
+  margin: 0 0 3rem;
   font-size: var(--text-lede);
   font-weight: 560;
   letter-spacing: -.03em;
@@ -1063,6 +1065,7 @@ footer p:last-child { justify-self: end; }
   .service-intro { grid-template-columns: 1fr; }
 
   .research-link { grid-column: 1; }
+  .finale { min-height: auto; }
 
   .spine {
     grid-template-columns: 1fr;
