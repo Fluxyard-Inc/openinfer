@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenInfer is an open protocol for machines to discover, purchase, verify, and settle intelligence and computation.">
+  <meta name="theme-color" content="#181a17">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OpenInfer — An open protocol for the machine economy.">
+  <meta property="og:description" content="A protocol for machines to discover, purchase, verify, and settle intelligence and computation.">
+  <meta property="og:url" content="https://openinfer.network/">
+  <title>OpenInfer — An open protocol for the machine economy.</title>
+  <link rel="canonical" href="https://openinfer.network/">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <a class="skip-link" href="#contents">Skip to the manifesto</a>
+
+  <header class="site-header">
+    <a class="mark" href="#top" aria-label="OpenInfer home"><span>O/I</span> OpenInfer</a>
+    <nav aria-label="Primary navigation">
+      <a href="#contents">Contents</a>
+      <a href="#protocol">Protocol</a>
+      <a href="#verification">Verification</a>
+      <a href="#roadmap">Roadmap</a>
+    </nav>
+    <a class="header-link" href="https://github.com/Fluxyard-Inc/openinfer">Source ↗</a>
+  </header>
+
+  <main>
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <p class="eyebrow hero-eyebrow"><span>Manifesto 001</span><span>September 2026</span></p>
+        <h1 id="hero-title"><span>OpenInfer</span></h1>
+        <div class="hero-bottom">
+          <p>An open protocol for machine intelligence.</p>
+          <a class="read-link" href="#contents">Read the manifesto <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="contents" id="contents" aria-labelledby="contents-title">
+      <div class="contents-intro reveal">
+        <p class="section-label">Manifesto / 6 chapters / ~12 min</p>
+        <h2 id="contents-title">A protocol, read in six movements.</h2>
+        <p>Read straight through or enter at the question that matters to you. Every chapter has one job.</p>
+      </div>
+      <ol class="contents-list">
+        <li class="reveal"><a href="#vision"><span>01</span><strong>The need</strong><small>Why autonomous machines require their own economic primitives.</small></a></li>
+        <li class="reveal"><a href="#protocol"><span>02</span><strong>The protocol</strong><small>How strangers discover, transact, and settle without a privileged router.</small></a></li>
+        <li class="reveal"><a href="#verification"><span>03</span><strong>The trust model</strong><small>Receipts, challenges, progressive assurance, and economic security.</small></a></li>
+        <li class="reveal"><a href="#economy"><span>04</span><strong>The agent economy</strong><small>What changes when software can independently purchase useful work.</small></a></li>
+        <li class="reveal"><a href="#roadmap"><span>05</span><strong>The path</strong><small>From Fluxyard’s GPU market to an open market for machine services.</small></a></li>
+        <li class="reveal"><a href="#principles"><span>06</span><strong>The principles</strong><small>The constraints that keep OpenInfer open, useful, and accountable.</small></a></li>
+      </ol>
+    </section>
+
+    <section class="thesis section-grid reveal" id="vision" aria-labelledby="vision-title">
+      <p class="section-label">Chapter I · 00 / The vision</p>
+      <div>
+        <h2 id="vision-title">Any machine should be able to buy intelligence from any other machine.</h2>
+        <p class="lede">Without permission, prior relationships, or blind trust.</p>
+        <p>AI is becoming autonomous. Agents can reason, write software, search, operate computers, and manage workflows. But the infrastructure beneath them still depends on accounts and commercial relationships established by humans. An agent can consume services. It cannot truly procure them.</p>
+      </div>
+    </section>
+
+    <section class="contrast-section reveal" aria-labelledby="contrast-title">
+      <div class="contrast-heading">
+        <p class="section-label">Chapter I · 01 / The missing layer</p>
+        <h2 id="contrast-title">Humans have institutions.<br>Machines need primitives.</h2>
+      </div>
+      <div class="contrast-grid">
+        <article>
+          <p class="micro-label">Human trust infrastructure</p>
+          <ul>
+            <li>Contracts and counterparties</li>
+            <li>Corporate reputation</li>
+            <li>Banks and invoicing</li>
+            <li>SLAs, courts, and lawyers</li>
+          </ul>
+          <p>This works. A company purchasing cloud infrastructure may be better served by a legal agreement, insurance, and an identifiable vendor. OpenInfer does not exist to abolish that system.</p>
+        </article>
+        <article class="pastel-panel">
+          <p class="micro-label">Machine trust infrastructure</p>
+          <ul>
+            <li>Cryptographic identity</li>
+            <li>Machine-readable offers</li>
+            <li>Verifiable reputation</li>
+            <li>Programmable settlement</li>
+          </ul>
+          <p>Autonomous software may make thousands of tiny procurement decisions across counterparties that exist for seconds. A legal relationship for every transaction is impossible.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="declaration reveal" aria-label="OpenInfer thesis">
+      <p class="section-label">The thesis</p>
+      <blockquote>Autonomous agents need a permissionless way to discover, purchase, verify, and pay other machines for intelligence and computation.</blockquote>
+    </section>
+
+    <section class="system reveal" id="protocol" aria-labelledby="protocol-title">
+      <div class="section-grid system-intro">
+        <p class="section-label">Chapter II · 02 / The protocol</p>
+        <div>
+          <h2 id="protocol-title">A complete transaction between strangers.</h2>
+          <p class="lede">OpenInfer provides the economic control loop. Providers and buyers remain replaceable.</p>
+        </div>
+      </div>
+      <ol class="spine protocol-spine" aria-label="OpenInfer protocol loop">
+        <li><span>01</span><strong>Discover</strong><small>Find capability</small></li>
+        <li><span>02</span><strong>Negotiate</strong><small>Choose terms</small></li>
+        <li><span>03</span><strong>Commit</strong><small>Lock the claim</small></li>
+        <li><span>04</span><strong>Execute</strong><small>Perform work</small></li>
+        <li><span>05</span><strong>Verify</strong><small>Test the receipt</small></li>
+        <li><span>06</span><strong>Settle</strong><small>Pay or slash</small></li>
+      </ol>
+    </section>
+
+    <section class="market-section" aria-labelledby="market-title">
+      <div class="market-copy reveal">
+        <p class="section-label">Chapter II · 03 / The first market</p>
+        <h2 id="market-title">Begin with open-model inference.</h2>
+        <p>Inference is the first service that makes every part of the protocol concrete: capability, price, performance, usage, artifact identity, verification, and settlement.</p>
+        <p>A provider should be able to announce a model, endpoint, price, stake, and execution profile—and compete for traffic without an application, sales call, or preferred-provider agreement.</p>
+      </div>
+
+      <div class="specimen reveal" aria-label="Example machine-readable inference offer">
+        <p class="micro-label">Agent procurement policy</p>
+        <dl>
+          <div><dt>Model</dt><dd>GLM-5.2</dd></div>
+          <div><dt>Price</dt><dd>≤ $0.80 / M</dd></div>
+          <div><dt>Latency</dt><dd>&lt; 500 ms TTFT</dd></div>
+          <div><dt>Reliability</dt><dd>&gt; 99.9%</dd></div>
+          <div><dt>Verification</dt><dd>optimistic-v2</dd></div>
+          <div><dt>Stake</dt><dd>&gt; $100,000</dd></div>
+          <div><dt>Reputation</dt><dd>&gt; 0.995</dd></div>
+        </dl>
+        <p class="specimen-result">Constraints satisfied → buy()</p>
+      </div>
+    </section>
+
+    <section class="router-section reveal" aria-labelledby="router-title">
+      <div class="section-grid">
+        <p class="section-label">Chapter II · 04 / Market, not middleman</p>
+        <div>
+          <h2 id="router-title">OpenInfer is not the router.</h2>
+          <p class="lede">It is the market underneath every router.</p>
+          <p>Fluxyard may bootstrap the first product: a familiar compute marketplace and gateway built on OpenInfer. It must never become indispensable. Anyone can build another router; an agent can query competing offers directly and route its own work. OpenInfer exposes supply. The buyer decides what “best” means.</p>
+        </div>
+      </div>
+
+      <figure class="protocol-diagram market-diagram reveal" role="img" aria-labelledby="market-diagram-caption">
+        <svg class="diagram-desktop" viewBox="0 0 960 390" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="market-arrow-desktop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 8 4 0 8Z"></path>
+            </marker>
+          </defs>
+          <rect class="diagram-node diagram-node-primary" x="290" y="30" width="380" height="100" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="480" y="69" text-anchor="middle">SHARED PROVIDER MARKET</text>
+          <text class="diagram-detail diagram-detail-inverse" x="480" y="98" text-anchor="middle">OpenInfer · registry · receipts · settlement</text>
+
+          <path class="diagram-line" d="M480 130V215M160 215H800"></path>
+          <path class="diagram-line diagram-arrow" d="M160 215V265" marker-end="url(#market-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M480 215V265" marker-end="url(#market-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M800 215V265" marker-end="url(#market-arrow-desktop)"></path>
+
+          <rect class="diagram-node" x="40" y="270" width="240" height="88" rx="3"></rect>
+          <text class="diagram-title" x="160" y="307" text-anchor="middle">FLUXYARD</text>
+          <text class="diagram-detail" x="160" y="333" text-anchor="middle">gateway + router</text>
+
+          <rect class="diagram-node" x="360" y="270" width="240" height="88" rx="3"></rect>
+          <text class="diagram-title" x="480" y="307" text-anchor="middle">AGENT A</text>
+          <text class="diagram-detail" x="480" y="333" text-anchor="middle">direct buyer</text>
+
+          <rect class="diagram-node" x="680" y="270" width="240" height="88" rx="3"></rect>
+          <text class="diagram-title" x="800" y="307" text-anchor="middle">AGENT B</text>
+          <text class="diagram-detail" x="800" y="333" text-anchor="middle">direct buyer</text>
+        </svg>
+
+        <svg class="diagram-mobile" viewBox="0 0 360 550" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="market-arrow-mobile" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 8 4 0 8Z"></path>
+            </marker>
+          </defs>
+          <rect class="diagram-node diagram-node-primary" x="20" y="20" width="320" height="110" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="180" y="55" text-anchor="middle">SHARED PROVIDER MARKET</text>
+          <text class="diagram-detail diagram-detail-inverse" x="180" y="82" text-anchor="middle">OpenInfer protocol</text>
+          <text class="diagram-detail diagram-detail-inverse" x="180" y="103" text-anchor="middle">registry · receipts · settlement</text>
+
+          <path class="diagram-line" d="M180 130V150H25V482"></path>
+          <path class="diagram-line diagram-arrow" d="M25 214H55" marker-end="url(#market-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M25 344H55" marker-end="url(#market-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M25 474H55" marker-end="url(#market-arrow-mobile)"></path>
+
+          <rect class="diagram-node" x="55" y="170" width="285" height="88" rx="3"></rect>
+          <text class="diagram-title" x="197.5" y="207" text-anchor="middle">FLUXYARD</text>
+          <text class="diagram-detail" x="197.5" y="233" text-anchor="middle">gateway + router</text>
+
+          <rect class="diagram-node" x="55" y="300" width="285" height="88" rx="3"></rect>
+          <text class="diagram-title" x="197.5" y="337" text-anchor="middle">AGENT A</text>
+          <text class="diagram-detail" x="197.5" y="363" text-anchor="middle">direct buyer</text>
+
+          <rect class="diagram-node" x="55" y="430" width="285" height="88" rx="3"></rect>
+          <text class="diagram-title" x="197.5" y="467" text-anchor="middle">AGENT B</text>
+          <text class="diagram-detail" x="197.5" y="493" text-anchor="middle">direct buyer</text>
+        </svg>
+        <figcaption id="market-diagram-caption">One shared provider market can serve Fluxyard and autonomous agents directly. Fluxyard is a client of the protocol, not its owner.</figcaption>
+      </figure>
+    </section>
+
+    <section class="offchain-section reveal" aria-labelledby="offchain-title">
+      <p class="section-label">Chapter II · 05 / A boundary</p>
+      <div>
+        <h2 id="offchain-title">Trust-minimized does not mean putting AI on a blockchain.</h2>
+        <p>Prompts do not need consensus. Transformer operations do not belong in smart contracts. Latency-sensitive computation remains a direct path from buyer to provider to hardware.</p>
+        <p>The protocol lives around the work: identity, discovery, commitment, verification, reputation, and settlement. Blockchain infrastructure may provide useful primitives for some of these functions. It is not the product.</p>
+      </div>
+    </section>
+
+    <section class="verification" id="verification" aria-labelledby="verification-title">
+      <div class="verification-heading reveal">
+        <p class="section-label">Chapter III · 06 / Verification</p>
+        <h2 id="verification-title">A receipt is a claim.<br>Verification makes it accountable.</h2>
+        <p>When an unknown provider says “I served this model and generated this usage,” the protocol must make five properties legible.</p>
+      </div>
+
+      <ol class="verification-list">
+        <li class="reveal"><span>01</span><h3>Usage</h3><p>Was the reported quantity of work calculated correctly from a canonical tokenizer and request?</p></li>
+        <li class="reveal"><span>02</span><h3>Artifact</h3><p>Did the provider serve the advertised model, weights, quantization, and execution profile?</p></li>
+        <li class="reveal"><span>03</span><h3>Execution</h3><p>Was the computation faithful enough to satisfy that profile rather than a cheap substitute?</p></li>
+        <li class="reveal"><span>04</span><h3>Performance</h3><p>Did the provider deliver the latency, throughput, and availability it advertised?</p></li>
+        <li class="reveal"><span>05</span><h3>History</h3><p>Has this identity consistently satisfied its claims across prior transactions and challenges?</p></li>
+      </ol>
+    </section>
+
+    <section class="optimistic-section" aria-labelledby="optimistic-title">
+      <div class="optimistic-copy reveal">
+        <p class="section-label">Chapter III · 07 / Optimistic verification</p>
+        <h2 id="optimistic-title">Commit first.<br>Challenge after.</h2>
+        <p>The provider returns its output with a signed receipt and a commitment to what happened during execution. Only after that commitment is locked does protocol randomness decide whether—and where—the computation must be opened.</p>
+        <p>The provider cannot know in advance which token, layer, expert route, or activation region will be inspected. Most transactions settle cheaply. Random or suspicious transactions escalate.</p>
+      </div>
+
+      <figure class="protocol-diagram verification-diagram reveal" role="img" aria-labelledby="verification-diagram-caption">
+        <svg class="diagram-desktop" viewBox="0 0 760 920" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="verification-arrow-desktop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 8 4 0 8Z"></path>
+            </marker>
+          </defs>
+
+          <path class="diagram-line diagram-arrow" d="M300 62V92" marker-end="url(#verification-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M300 144V174" marker-end="url(#verification-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M300 238V268" marker-end="url(#verification-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M300 332V362" marker-end="url(#verification-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M410 118H560" marker-end="url(#verification-arrow-desktop)"></path>
+
+          <rect class="diagram-node" x="190" y="10" width="220" height="52" rx="3"></rect>
+          <text class="diagram-title" x="300" y="42" text-anchor="middle">REQUEST</text>
+          <rect class="diagram-node" x="190" y="92" width="220" height="52" rx="3"></rect>
+          <text class="diagram-title" x="300" y="124" text-anchor="middle">INFERENCE</text>
+          <rect class="diagram-node diagram-node-muted" x="560" y="92" width="170" height="52" rx="3"></rect>
+          <text class="diagram-title" x="645" y="124" text-anchor="middle">OUTPUT</text>
+
+          <rect class="diagram-node" x="175" y="174" width="250" height="64" rx="3"></rect>
+          <text class="diagram-title" x="300" y="202" text-anchor="middle">EXECUTION COMMITMENT</text>
+          <text class="diagram-detail" x="300" y="222" text-anchor="middle">claim locked before audit</text>
+          <rect class="diagram-node diagram-node-primary" x="175" y="268" width="250" height="64" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="300" y="296" text-anchor="middle">SIGNED RECEIPT</text>
+          <text class="diagram-detail diagram-detail-inverse" x="300" y="316" text-anchor="middle">output + usage + commitment</text>
+          <rect class="diagram-node" x="175" y="362" width="250" height="64" rx="3"></rect>
+          <text class="diagram-title" x="300" y="390" text-anchor="middle">RANDOMNESS</text>
+          <text class="diagram-detail" x="300" y="410" text-anchor="middle">revealed after commit</text>
+
+          <path class="diagram-line" d="M300 426V466M115 466H590"></path>
+          <path class="diagram-line diagram-arrow" d="M115 466V505" marker-end="url(#verification-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M590 466V505" marker-end="url(#verification-arrow-desktop)"></path>
+          <rect class="diagram-node diagram-node-muted" x="30" y="510" width="170" height="52" rx="3"></rect>
+          <text class="diagram-title" x="115" y="542" text-anchor="middle">ACCEPT</text>
+          <rect class="diagram-node" x="490" y="510" width="200" height="52" rx="3"></rect>
+          <text class="diagram-title" x="590" y="542" text-anchor="middle">CHALLENGE</text>
+
+          <path class="diagram-line diagram-arrow" d="M115 562V602" marker-end="url(#verification-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M590 562V602" marker-end="url(#verification-arrow-desktop)"></path>
+          <rect class="diagram-node diagram-node-terminal" x="30" y="607" width="170" height="52" rx="3"></rect>
+          <text class="diagram-title" x="115" y="639" text-anchor="middle">PAY</text>
+          <rect class="diagram-node" x="490" y="607" width="200" height="64" rx="3"></rect>
+          <text class="diagram-title" x="590" y="635" text-anchor="middle">OPEN COMPUTATION</text>
+          <text class="diagram-detail" x="590" y="655" text-anchor="middle">selected transition</text>
+
+          <path class="diagram-line diagram-arrow" d="M590 671V711" marker-end="url(#verification-arrow-desktop)"></path>
+          <rect class="diagram-node" x="490" y="716" width="200" height="52" rx="3"></rect>
+          <text class="diagram-title" x="590" y="748" text-anchor="middle">VERIFY</text>
+          <path class="diagram-line" d="M590 768V798M485 798H665"></path>
+          <path class="diagram-line diagram-arrow" d="M485 798V827" marker-end="url(#verification-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M665 798V827" marker-end="url(#verification-arrow-desktop)"></path>
+
+          <rect class="diagram-node diagram-node-terminal" x="410" y="832" width="150" height="58" rx="3"></rect>
+          <text class="diagram-title" x="485" y="856" text-anchor="middle">VALID</text>
+          <text class="diagram-detail" x="485" y="876" text-anchor="middle">pay</text>
+          <rect class="diagram-node diagram-node-danger" x="590" y="832" width="150" height="58" rx="3"></rect>
+          <text class="diagram-title" x="665" y="856" text-anchor="middle">FRAUD</text>
+          <text class="diagram-detail" x="665" y="876" text-anchor="middle">slash</text>
+        </svg>
+
+        <svg class="diagram-mobile" viewBox="0 0 360 1030" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="verification-arrow-mobile" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 8 4 0 8Z"></path>
+            </marker>
+          </defs>
+
+          <path class="diagram-line diagram-arrow" d="M140 70V100" marker-end="url(#verification-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M140 158V188" marker-end="url(#verification-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M140 252V282" marker-end="url(#verification-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M140 346V376" marker-end="url(#verification-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M260 129H292" marker-end="url(#verification-arrow-mobile)"></path>
+
+          <rect class="diagram-node" x="20" y="18" width="240" height="52" rx="3"></rect>
+          <text class="diagram-title" x="140" y="50" text-anchor="middle">REQUEST</text>
+          <rect class="diagram-node" x="20" y="106" width="240" height="52" rx="3"></rect>
+          <text class="diagram-title" x="140" y="138" text-anchor="middle">INFERENCE</text>
+          <rect class="diagram-node diagram-node-muted" x="292" y="103" width="62" height="52" rx="3"></rect>
+          <text class="diagram-detail" x="323" y="133" text-anchor="middle">output</text>
+
+          <rect class="diagram-node" x="20" y="188" width="240" height="64" rx="3"></rect>
+          <text class="diagram-title" x="140" y="216" text-anchor="middle">EXECUTION COMMITMENT</text>
+          <text class="diagram-detail" x="140" y="236" text-anchor="middle">claim locked before audit</text>
+          <rect class="diagram-node diagram-node-primary" x="20" y="282" width="240" height="64" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="140" y="310" text-anchor="middle">SIGNED RECEIPT</text>
+          <text class="diagram-detail diagram-detail-inverse" x="140" y="330" text-anchor="middle">output + usage + commitment</text>
+          <rect class="diagram-node" x="20" y="376" width="240" height="64" rx="3"></rect>
+          <text class="diagram-title" x="140" y="404" text-anchor="middle">RANDOMNESS</text>
+          <text class="diagram-detail" x="140" y="424" text-anchor="middle">revealed after commit</text>
+
+          <path class="diagram-line" d="M140 440V480H20V736"></path>
+          <path class="diagram-line diagram-arrow" d="M20 524H50" marker-end="url(#verification-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M20 704H50" marker-end="url(#verification-arrow-mobile)"></path>
+          <rect class="diagram-node diagram-node-muted" x="50" y="492" width="285" height="64" rx="3"></rect>
+          <text class="diagram-title" x="192.5" y="520" text-anchor="middle">ACCEPT</text>
+          <text class="diagram-detail" x="192.5" y="540" text-anchor="middle">most requests</text>
+          <path class="diagram-line diagram-arrow" d="M192.5 556V596" marker-end="url(#verification-arrow-mobile)"></path>
+          <rect class="diagram-node diagram-node-terminal" x="50" y="601" width="285" height="52" rx="3"></rect>
+          <text class="diagram-title" x="192.5" y="633" text-anchor="middle">PAY</text>
+
+          <rect class="diagram-node" x="50" y="672" width="285" height="64" rx="3"></rect>
+          <text class="diagram-title" x="192.5" y="700" text-anchor="middle">CHALLENGE</text>
+          <text class="diagram-detail" x="192.5" y="720" text-anchor="middle">random or suspicious</text>
+          <path class="diagram-line diagram-arrow" d="M192.5 736V776" marker-end="url(#verification-arrow-mobile)"></path>
+          <rect class="diagram-node" x="50" y="781" width="285" height="64" rx="3"></rect>
+          <text class="diagram-title" x="192.5" y="809" text-anchor="middle">OPEN COMPUTATION</text>
+          <text class="diagram-detail" x="192.5" y="829" text-anchor="middle">selected transition</text>
+          <path class="diagram-line diagram-arrow" d="M192.5 845V885" marker-end="url(#verification-arrow-mobile)"></path>
+          <rect class="diagram-node" x="50" y="890" width="285" height="52" rx="3"></rect>
+          <text class="diagram-title" x="192.5" y="922" text-anchor="middle">VERIFY</text>
+
+          <path class="diagram-line" d="M192.5 942V970M112 970H273"></path>
+          <path class="diagram-line diagram-arrow" d="M112 970V980" marker-end="url(#verification-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M273 970V980" marker-end="url(#verification-arrow-mobile)"></path>
+          <rect class="diagram-node diagram-node-terminal" x="50" y="985" width="124" height="40" rx="3"></rect>
+          <text class="diagram-detail" x="112" y="1009" text-anchor="middle">VALID · PAY</text>
+          <rect class="diagram-node diagram-node-danger" x="211" y="985" width="124" height="40" rx="3"></rect>
+          <text class="diagram-detail" x="273" y="1009" text-anchor="middle">FRAUD · SLASH</text>
+        </svg>
+        <figcaption id="verification-diagram-caption">The provider commits before audit randomness is revealed. Most receipts are accepted and paid; challenged receipts open a selected computation and either pay or slash.</figcaption>
+      </figure>
+    </section>
+
+    <section class="assurance-section reveal" aria-labelledby="assurance-title">
+      <div class="section-grid">
+        <p class="section-label">Chapter III · 08 / Progressive assurance</p>
+        <div>
+          <h2 id="assurance-title">Trust should be purchased in proportion to risk.</h2>
+          <p class="lede">A two-cent request and a ten-million-dollar decision should not carry the same proof burden.</p>
+        </div>
+      </div>
+      <ol class="assurance-levels">
+        <li><span>Level 0</span><strong>Signed receipt</strong><small>Identity and claim</small></li>
+        <li><span>Level 1</span><strong>Usage check</strong><small>Independent metering</small></li>
+        <li><span>Level 2</span><strong>Optimistic challenge</strong><small>Random openings</small></li>
+        <li><span>Level 3</span><strong>Trace challenge</strong><small>Transition replay</small></li>
+        <li><span>Level 4</span><strong>TEE attestation</strong><small>Hardware evidence</small></li>
+        <li><span>Level 5</span><strong>Cryptographic proof</strong><small>ZK or equivalent</small></li>
+      </ol>
+    </section>
+
+    <section class="economics-section" aria-labelledby="economics-title">
+      <div class="economics-copy reveal">
+        <p class="section-label">Chapter III · 09 / Economic security</p>
+        <h2 id="economics-title">Perfect detection is unnecessary.</h2>
+        <p>The practical objective is to make honest execution more profitable than fraud. Providers place capital behind their claims. Unpredictable audits create detection risk. Proven fraud destroys stake and rewards the challenger who found it.</p>
+      </div>
+      <div class="equation reveal" aria-label="Expected profit from fraud is less than expected loss from detection">
+        <span>Expected profit<br>from fraud</span>
+        <strong>&lt;</strong>
+        <span>Expected loss<br>from detection</span>
+        <small>EV<sub>fraud</sub> &lt; 0</small>
+      </div>
+    </section>
+
+    <section class="challenger-section reveal" aria-labelledby="challenger-title">
+      <p class="section-label">Chapter III · 10 / Open enforcement</p>
+      <div>
+        <h2 id="challenger-title">Verification must also be permissionless.</h2>
+        <p>A decentralized provider market with a centralized fraud department is not enough. Anyone should eventually be able to challenge execution commitments, prove fraud, and earn part of the penalty. Providers earn by computing. Challengers earn by finding dishonest computation. Neither needs permission from OpenInfer.</p>
+      </div>
+    </section>
+
+    <section class="utility-section reveal" id="economy" aria-labelledby="utility-title">
+      <div>
+        <p class="section-label">Chapter IV · 11 / Useful computation</p>
+        <h2 id="utility-title">Proof of quality matters as much as proof of compute.</h2>
+        <p>A mathematically valid execution can still be a terrible service. Buyers care about quality, price, latency, throughput, availability, context, privacy, and verification. No routing algorithm should be universally privileged.</p>
+      </div>
+      <div class="utility-equation" aria-label="Utility equals quality times performance times reliability times trust, divided by cost">
+        <span>Quality × Performance × Reliability × Trust</span>
+        <hr>
+        <span>Cost</span>
+        <small>Each buyer sets its own weights.</small>
+      </div>
+    </section>
+
+    <section class="money-section reveal" aria-labelledby="money-title">
+      <p class="section-label">Chapter IV · 12 / Money and security</p>
+      <div>
+        <h2 id="money-title">Stable money for commerce.<br>Security only where required.</h2>
+        <p>Agents budget in stable units. They should not need to speculate on a volatile asset to buy inference. Stablecoins are a natural settlement rail for commerce.</p>
+        <p>If a native asset ever improves staking, slashing, validation, or governance, the protocol should earn the right to introduce one. The sequence is utility, market, protocol, demonstrated security need—and only then a token, if necessary.</p>
+      </div>
+    </section>
+
+    <section class="agent-section" aria-labelledby="agent-title">
+      <div class="agent-copy reveal">
+        <p class="section-label">Chapter IV · 13 / Why agents</p>
+        <h2 id="agent-title">The agent becomes an economic actor.</h2>
+        <p>Today an agent operates inside relationships created by its owner: cloud credentials, API keys, billing accounts, and approved vendors. It can decide what to do. It cannot independently decide who to do business with.</p>
+        <p>A wallet and protocol identity change that. An agent can discover a service, evaluate the offer, purchase it, verify delivery, and settle—entirely through software.</p>
+      </div>
+      <div class="agent-budget reveal" aria-label="Example autonomous agent budget and purchases">
+        <div><span>Wallet</span><strong>$37.42 USDC</strong></div>
+        <div><span>Objective</span><strong>Research a biotechnology question</strong></div>
+        <div><span>Budget</span><strong>$10.00</strong></div>
+        <ul>
+          <li><span>Search</span><b>$0.03</b></li>
+          <li><span>Reasoning</span><b>$0.18</b></li>
+          <li><span>Document parsing</span><b>$0.04</b></li>
+          <li><span>Specialist model</span><b>$0.31</b></li>
+          <li><span>GPU compute</span><b>$0.12</b></li>
+          <li><span>Second opinion</span><b>$0.09</b></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="horizon" id="roadmap" aria-labelledby="horizon-title">
+      <div class="horizon-heading reveal">
+        <p class="section-label">Chapter V · 14 / The path</p>
+        <h2 id="horizon-title">The machine economy is built in earned steps.</h2>
+      </div>
+      <div class="horizon-steps">
+        <article class="reveal">
+          <p>Foundation</p>
+          <h3>Fluxyard marketplace</h3>
+          <p>Build the dependable, familiar GPU marketplace first. Make independently operated hardware legible and prove placement, recovery, metering, and settlement with conventional workloads.</p>
+        </article>
+        <article class="reveal">
+          <p>First market</p>
+          <h3>OpenInfer network</h3>
+          <p>Let providers compete to serve open models through machine-readable offers, signed receipts, independent metering, and progressive verification.</p>
+        </article>
+        <article class="reveal">
+          <p>End state</p>
+          <h3>Open machine services</h3>
+          <p>Extend the same transaction primitive to compute, data, media, tools, and specialist agents—without making OpenInfer the mandatory buyer or seller.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="service-market reveal" aria-labelledby="services-title">
+      <div>
+        <p class="section-label">Chapter V · 15 / Beyond inference</p>
+        <h2 id="services-title">One market primitive.<br>Many kinds of useful work.</h2>
+      </div>
+      <div class="service-columns">
+        <div><strong>Intelligence</strong><span>Reasoning</span><span>Coding</span><span>Vision</span><span>Embeddings</span></div>
+        <div><strong>Compute</strong><span>GPU</span><span>CPU</span><span>Storage</span><span>Memory</span></div>
+        <div><strong>Data</strong><span>Web</span><span>Financial</span><span>Scientific</span><span>Private</span></div>
+        <div><strong>Services</strong><span>Search</span><span>Browser</span><span>Code execution</span><span>Agents</span></div>
+      </div>
+    </section>
+
+    <section class="research-section reveal" aria-labelledby="research-title">
+      <p class="section-label">Chapter V · 16 / The research question</p>
+      <div>
+        <h2 id="research-title">Can optimistic verification make large-model inference economically trust-minimized?</h2>
+        <p>For trillion-parameter Mixture-of-Experts models, can a provider cheaply commit to enough of its execution that unpredictable post-commit challenges detect dishonest computation at a tiny fraction of the cost of reproducing the original request?</p>
+        <p>The target is not theoretical perfection. It is a machine-readable economic guarantee strong enough that an autonomous agent can rationally transact with an unknown provider.</p>
+      </div>
+    </section>
+
+    <section class="principles" id="principles" aria-labelledby="principles-title">
+      <div class="principles-heading reveal">
+        <p class="section-label">Chapter VI · 17 / Principles</p>
+        <h2 id="principles-title">What guides the protocol.</h2>
+      </div>
+      <ol class="principle-list compact-principles">
+        <li class="reveal"><span class="principle-number">01</span><h3>Permissionless by default.</h3><p>If a participant satisfies the protocol, OpenInfer should not decide whether it belongs.</p></li>
+        <li class="reveal"><span class="principle-number">02</span><h3>Compute stays off-chain.</h3><p>Use decentralized infrastructure around execution, not inside the latency-sensitive path.</p></li>
+        <li class="reveal"><span class="principle-number">03</span><h3>No privileged router.</h3><p>Gateways are clients of the market. An agent must be free to route for itself.</p></li>
+        <li class="reveal"><span class="principle-number">04</span><h3>Claims require receipts.</h3><p>Capability, price, execution, usage, and performance should be machine-readable and challengeable.</p></li>
+        <li class="reveal"><span class="principle-number">05</span><h3>Assurance is progressive.</h3><p>Buy the verification appropriate to the value and risk of the transaction.</p></li>
+        <li class="reveal"><span class="principle-number">06</span><h3>Economics completes cryptography.</h3><p>Make the expected value of fraud negative and reward independent enforcement.</p></li>
+        <li class="reveal"><span class="principle-number">07</span><h3>Utility precedes token design.</h3><p>Real demand, providers, payments, and adversarial behavior come first.</p></li>
+        <li class="reveal"><span class="principle-number">08</span><h3>Reliability earns expansion.</h3><p>Make one strange hardware combination boringly reliable. Then generalize.</p></li>
+      </ol>
+    </section>
+
+    <section class="finale" id="north-star" aria-labelledby="north-star-title">
+      <div class="finale-glow" aria-hidden="true"></div>
+      <p class="section-label">Chapter VI · 18 / Our north star</p>
+      <h2 id="north-star-title">Can two machines that have never met complete a useful economic transaction?</h2>
+      <p class="north-star-copy">Can they discover one another, agree on the purchase of intelligence, execute the work, determine whether the agreement was satisfied, and settle payment—without a trusted intermediary or human intervention?</p>
+      <p class="north-star-answer">If yes, the protocol is working.<br><em>Everything else is implementation.</em></p>
+      <a class="final-link" href="https://github.com/Fluxyard-Inc/fluxyard">Explore the Fluxyard implementation <span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
+
+  <footer>
+    <a class="mark" href="#top" aria-label="Back to top"><span>O/I</span> OpenInfer</a>
+    <p>An open protocol for the machine economy.</p>
+    <p>Manifesto / 001</p>
+  </footer>
+</body>
+</html>
