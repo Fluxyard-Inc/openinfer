@@ -941,12 +941,30 @@ footer p:last-child { justify-self: end; }
 .agent-budget li b { font: 500 var(--text-label)/1.5 var(--mono); text-align: right; }
 .agent-budget li:last-child { border-bottom: 0; }
 
-.service-market {  background: var(--paper);  color: var(--ink);}.service-market .section-label { color: var(--sky-dark); }.service-market h2 { max-width: 15ch; margin-top: 2rem; }.service-columns {  display: grid;  grid-template-columns: repeat(4, 1fr);  margin-top: clamp(4rem, 7vw, 7rem);  border-top: 1px solid var(--line);  border-left: 1px solid var(--line);}.service-columns div {  display: grid;  min-height: 19rem;  align-content: start;  padding: 1.5rem;  border-right: 1px solid var(--line);  border-bottom: 1px solid var(--line);}.service-columns strong { margin-bottom: 2rem; color: var(--sky-dark); font-size: var(--text-subhead); font-weight: 550; }.service-columns span { padding: .65rem 0; border-bottom: 1px solid var(--line); color: var(--stone); }
+.service-market { background: var(--paper); }
+.service-market .section-label { color: var(--sky-dark); }
+.service-market h2 { max-width: 20ch; margin: 2rem 0 2.3rem; }
+
+.service-intro {
+  display: grid;
+  max-width: 68rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.service-intro p { margin: 0; color: var(--stone); }
+
+.services-diagram {
+  margin-top: clamp(4rem, 7vw, 7rem);
+  background: var(--paper-2);
+}
 
 .research-section { background: var(--paper-2); }
 .research-section .section-label { color: var(--sky-dark); }
 .research-section h2 { max-width: 17ch; margin-bottom: 2.5rem; }
 .research-section div p { max-width: 49rem; color: var(--stone); }
+.experiment-list { grid-column: 1 / -1; margin-top: clamp(3rem, 6vw, 6rem); }
+.research-link { grid-column: 2; width: max-content; margin-top: 2.5rem; }
 
 .compact-principles li { grid-template-columns: minmax(3.5rem, .5fr) minmax(17rem, 1.45fr) minmax(18rem, 1.25fr); }
 .compact-principles h3 { font-size: var(--text-subhead); }
@@ -1040,8 +1058,9 @@ footer p:last-child { justify-self: end; }
   .agent-budget strong,
   .agent-budget li b { text-align: left; }
 
-  .service-columns { grid-template-columns: 1fr; }
-  .service-columns div { min-height: auto; }
+  .service-intro { grid-template-columns: 1fr; }
+
+  .research-link { grid-column: 1; }
 
   .spine {
     grid-template-columns: 1fr;
