@@ -55,7 +55,7 @@ The protocol family should be implemented in this order:
 
 1. Encode and validate the core signed envelope in two languages.
 2. Publish cross-language canonicalization, digest, and signature fixtures.
-3. Implement `Offer`, `Request`, `Agreement`, `ExecutionCommitment`, `Receipt`, and `SettlementInstruction` processing in shadow mode.
+3. Implement `Offer`, `Request`, `Agreement`, `ExecutionCommitment`, `Receipt`, `ReceiptAcceptance`, `Finalization`, and settlement processing in shadow mode.
 4. Implement the inference profile with deterministic artifact identity and usage calculation.
 5. Map the objects onto Fluxyard's existing Offer-to-Charge path without changing real settlement.
 6. Add the optimistic profile only after an ordinary signed receipt survives restart, replay, timeout, and evidence-gap tests.

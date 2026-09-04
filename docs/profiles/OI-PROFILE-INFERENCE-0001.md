@@ -31,6 +31,7 @@ An inference `ExecutionProfile` payload identifies the artifact and numeric beha
 | --- | --- | --- |
 | `profile_id` | string | Provider-chosen identifier |
 | `profile_revision` | `UIntString` | Increased for any changed field |
+| `provider` | identity | MUST equal the envelope issuer |
 | `model_family` | string | Human-readable only; not identity |
 | `weights_manifest_digest` | digest | Digest of ordered file names, sizes, and file digests |
 | `tokenizer_digest` | digest | Tokenizer files plus normalization configuration |
@@ -40,10 +41,11 @@ An inference `ExecutionProfile` payload identifies the artifact and numeric beha
 | `numeric_profile` | string | Accumulator precision, rounding, normalization, and tolerance rules |
 | `sampling_profile` | string | Versioned sampling algorithm and seed semantics |
 | `context_limit_tokens` | `UIntString` | Maximum rendered input plus output tokens |
-| `trace_profiles` | array of `ProfileId` | Optional assurance-compatible trace schemas |
+| `layer_count` | `PositiveUIntString` | Number of model layers executed per token |
+| `trace_profiles` | array of `ProfileId` | Assurance-compatible trace schemas; empty when none |
 | `manifest_uri` | string or `null` | Retrieval hint; digest remains authoritative |
 
-Two profiles with different weights, tokenizers, templates, quantization, runtime behavior relevant to verification, or numeric rules are different artifacts even if they share a marketing model name.
+The tuple `(provider, profile_id, profile_revision)` MUST map to one envelope digest. Two profiles with different weights, tokenizers, templates, quantization, runtime behavior relevant to verification, or numeric rules are different artifacts even if they share a marketing model name.
 
 ### 3.1 Weights manifest
 
@@ -78,6 +80,7 @@ An inference `Offer.terms` payload is:
 ```
 
 All prices are integer asset minor units per one million tokens. Performance values are claims attributable to the provider; they are not proof.
+`minimum_charge` MUST NOT exceed `maximum_charge`.
 
 ## 5. Inference request
 
@@ -95,7 +98,10 @@ All prices are integer asset minor units per one million tokens. Performance val
       "messages": [
         {"role": "user", "content": "Explain the result."}
       ]
-    }
+    },
+    "uri": null,
+    "encryption_profile": null,
+    "recipient_key_id": null
   },
   "rendered_input_digest": "sha256:<digest>",
   "generation": {
@@ -111,8 +117,8 @@ All prices are integer asset minor units per one million tokens. Performance val
 
 ### 5.1 Input modes
 
-- `inline` includes `value`; `source_bytes = UTF8(JCS(value))`, `byte_length` is the length of `source_bytes`, and its core digest MUST equal `input.source_digest`.
-- `encrypted_ref` omits `value` and includes `uri`, `encryption_profile`, and `recipient_key_id`. The decrypted canonical source bytes MUST match `byte_length` and `input.source_digest`.
+- `inline` uses a non-null `value` and null `uri`, `encryption_profile`, and `recipient_key_id`; `source_bytes = UTF8(JCS(value))`, `byte_length` is the length of `source_bytes`, and its core digest MUST equal `input.source_digest`.
+- `encrypted_ref` uses null `value` and non-null `uri`, `encryption_profile`, and `recipient_key_id`. The decrypted canonical source bytes MUST match `byte_length` and `input.source_digest`.
 
 The committed tokenizer and prompt template render the source into `{ "media_type": "application/openinfer-token-ids+json", "token_ids": [...] }`. `rendered_input_digest` is the core digest of that JCS object. `ExecutionCommitment.input_digest` and `Receipt.input_digest` MUST equal `rendered_input_digest`; `source_digest` separately commits to the buyer-supplied source.
 
@@ -125,6 +131,8 @@ The committed tokenizer and prompt template render the source into `{ "media_typ
 - `stop` contains at most 16 unique UTF-8 strings, each at most 256 bytes.
 
 Integer-scaled parameters avoid cross-language floating-point serialization ambiguity. A request requiring a parameter not defined here needs a new profile revision.
+
+`Request.service_request.execution_profile_digest` MUST equal `Offer.terms.execution_profile_digest` in the exact Offer referenced by `Request.offer_digest`.
 
 ## 6. Output
 
@@ -165,7 +173,7 @@ The following rules are normative:
 4. Retries internal to the provider are not billable unless a different metering profile was accepted in the agreement.
 5. A streaming disconnect does not change generated usage already committed by the provider; the agreement defines whether undelivered output is chargeable.
 
-A verifier MUST recompute usage from the committed tokenizer, rendered input, and output token IDs. Text alone is insufficient when multiple token sequences can render the same text.
+The buyer MUST recompute usage from the committed tokenizer, rendered input, and output token IDs before authorizing ReceiptAcceptance. Text alone is insufficient when multiple token sequences can render the same text.
 
 ## 8. Performance
 
@@ -180,21 +188,23 @@ Receipt performance claims are:
 }
 ```
 
-All durations are non-negative integer milliseconds. Throughput is output tokens per second multiplied by 1000 and rounded down. Provider clock claims remain untrusted unless an assurance profile defines independent observation.
+All durations are non-negative integer milliseconds. Throughput is output tokens per second multiplied by 1000 and rounded down. A reported value that violates the bound in `Offer.terms.performance_claim` is `performance_claim_failed`. Provider clock claims remain untrusted unless an assurance profile defines independent observation.
 
 ## 9. Receipt requirements
 
 An inference `Receipt` uses the core fields and MUST additionally satisfy:
 
 - `service_profile` is `oi.inference/0.1`;
-- `execution_profile_digest` matches the agreement and commitment;
+- `execution_profile_digest` matches the Offer terms bound by `Agreement.offer_digest`, the Request, and the commitment;
 - `input_digest` matches the rendered input committed by the request;
 - `output_digest` matches the profile output object;
 - `usage` conforms to section 7;
 - `performance` conforms to section 8; and
-- `completed_at` is not earlier than `started_at`.
+- `started_at <= completed_at <=` the Receipt envelope `issued_at <= Agreement.receipt_deadline`.
 
 A changed tokenizer, prompt template, quantization, sampling profile, or seed is `profile_mismatch`, not a harmless implementation detail.
+
+For the baseline mock policy, `settlement_policy.finalizer` MUST equal the buyer. A usage mismatch is `usage_mismatch` and prevents ReceiptAcceptance.
 
 ## 10. Settlement amount
 
@@ -207,11 +217,11 @@ raw_charge    = input_charge + output_charge
 charge        = min(max(raw_charge, minimum_charge), maximum_charge)
 ```
 
-All operations use arbitrary-precision non-negative integers. The computed charge MUST NOT exceed the agreement's accepted amount. A mismatch is `settlement_conflict`.
+All operations use arbitrary-precision non-negative integers. The computed charge MUST NOT exceed the agreement's accepted amount. For a `pay` or `split` instruction after valid delivery, `provider_amount` MUST equal `charge` and `buyer_amount` MUST equal `accepted_amount - charge`. A mismatch is `settlement_conflict`.
 
-## 11. Failure outcomes
+## 11. Receipt validation errors
 
-The baseline service reason codes are:
+The baseline service-profile validation codes are:
 
 ```text
 invalid_execution_profile
@@ -219,17 +229,15 @@ input_digest_mismatch
 output_digest_mismatch
 usage_mismatch
 performance_claim_failed
-provider_timeout
-buyer_cancelled
-provider_error
 ```
 
-The signed settlement policy maps these reasons to `pay`, `refund`, `split`, or `hold`. The service profile does not introduce slashing.
+These codes reject the Receipt without a state transition; they are not Finalization reasons and MUST NOT directly authorize settlement. If no valid Receipt is accepted by the deadline, the core `receipt_timeout` rule applies. A `cancelled` or `error` output cannot receive a baseline `ReceiptAcceptance`. The service profile does not introduce slashing.
 
 ## 12. Privacy and security
 
 - Public discovery MUST NOT include prompts or outputs.
 - A receipt SHOULD expose only input and output digests plus bounded usage and performance metadata.
+- Third parties cannot verify usage without a disclosure-capable assurance profile; baseline usage validation is performed by the buyer before Receipt acceptance.
 - Providers MUST treat referenced input locations and decryption material as transaction secrets.
 - Buyers MUST NOT infer faithful model execution from a matching output digest or usage total alone.
 - Hosting untrusted workloads requires isolation stronger than a profile document; this profile makes no sandbox-security claim.
