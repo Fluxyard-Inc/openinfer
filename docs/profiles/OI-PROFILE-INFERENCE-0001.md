@@ -236,7 +236,7 @@ usage_mismatch
 performance_claim_failed
 ```
 
-These codes reject the Receipt without a state transition; they are not Finalization reasons and MUST NOT directly authorize settlement. If no valid Receipt is accepted by the deadline, the core `receipt_timeout` rule applies. A `cancelled` or `error` output cannot receive a baseline `ReceiptAcceptance`. The service profile does not introduce slashing.
+These codes reject the Receipt without a state transition; they are not Finalization reasons and MUST NOT directly authorize settlement. If no timely delivered Receipt is validated and accepted by `Agreement.acceptance_deadline`, the core `receipt_timeout` rule applies. A `cancelled` or `error` output cannot receive a baseline `ReceiptAcceptance`. The service profile does not introduce slashing.
 
 ## 12. Privacy and security
 

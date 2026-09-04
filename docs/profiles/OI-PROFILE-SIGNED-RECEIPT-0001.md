@@ -18,11 +18,11 @@ The Offer advertises `oi.signed-receipt/0.1`. The Request selects it with `assur
 
 The provider executes the accepted inference request and issues an ExecutionCommitment before its deadline. The commitment still binds the execution profile, rendered input, output, and usage digests; `commitment_profile` and `commitment` MUST both be `null`. The Receipt's `assurance_evidence` MUST be `null`. An anchor, trace, Challenge, Opening, OpeningAcceptance, or Verdict is neither required nor valid for this assurance profile.
 
-The Agreement MUST satisfy `verification_deadline >= receipt_deadline`. Core uniqueness, quote-asset equality, and worst-case reservation checks apply before accepting it.
+The Agreement MUST satisfy `verification_deadline >= acceptance_deadline`. Core uniqueness, quote-asset equality, and worst-case reservation checks apply before accepting it.
 
 ## 3. Acceptance and finalization
 
-The buyer MUST receive the entire committed output, validate the inference Receipt and all referenced digests, and recompute usage before signing ReceiptAcceptance. It accepts the Receipt and acknowledgement atomically before the receipt deadline. A valid acknowledgement transitions `committed` to `verification_pending`.
+The buyer MUST receive the entire committed output and Receipt by the receipt deadline, then validate the inference Receipt and all referenced digests and recompute usage before signing ReceiptAcceptance. It records its delivery observation in `receipt_observed_at` and accepts the Receipt and acknowledgement atomically by the acceptance deadline. A valid acknowledgement transitions `committed` to `verification_pending`.
 
 This assurance profile adds one Finalization reason:
 
@@ -65,4 +65,4 @@ The fixture's one-token model/tokenizer/template identifiers are synthetic test 
 | Issue pay instruction | buyer | Provider 1,000; buyer 1,000 |
 | Commit simulated ledger entry | mock adapter | `settled` |
 
-The same test file checks conflicting agreements, asset/scale changes, underfunding, output/usage substitution, accepted replays after expiry, late Opening observation for the optimistic profile, and closed policy registries. A future conformance suite must add the full encoding/error matrices and independently implemented validation.
+The same test file models sequential agreement deduplication, asset/scale changes, underfunding, output/usage substitution, accepted replays after expiry, delivery/acceptance windows, short-output challenge counts, late Opening observation for the optimistic profile, and closed policy registries. It does not test database races, transaction locks, restart durability, or external effects; those require integration tests in the future conformance suite alongside the full encoding/error matrices and independently implemented validation.

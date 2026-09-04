@@ -50,7 +50,7 @@ Passing sampled challenges does not prove that every unchallenged operation was 
 }
 ```
 
-Every stride, count, and window field is a `PositiveUIntString`. The provider MUST accept them before execution. A gateway or verifier MUST NOT change them after the execution commitment is signed. The Agreement MUST satisfy `verification_deadline >= receipt_deadline + challenge_window_seconds + opening_window_seconds + verdict_window_seconds`.
+Every stride, count, and window field is a `PositiveUIntString`. `challenge_count` is a maximum audit budget and MUST be at most 1024. The provider MUST accept these parameters before execution. A gateway or verifier MUST NOT change them after the execution commitment is signed. The Agreement MUST satisfy `verification_deadline >= acceptance_deadline + challenge_window_seconds + opening_window_seconds + verdict_window_seconds`.
 
 `single-reference-verifier` is permitted only for laboratory and Fluxyard shadow stages and requires the named challenger and verifier to equal `settlement_policy.finalizer`. An open market requires a separately specified deterministic verifier or quorum policy.
 
@@ -100,7 +100,7 @@ The `ExecutionCommitment.commitment` object is:
 }
 ```
 
-`leaf_count` and `challenge_count` MUST satisfy `leaf_count >= 1` and `1 <= challenge_count <= leaf_count`. This profile requires `commitment_profile = oi.merkle-sha256/0.1` and a non-null commitment. A Receipt with this assurance profile MUST report at least one output token. On Receipt validation, the receiver computes:
+Before deriving indices, a receiver MUST validate `1 <= leaf_count <= 4294967296` and `1 <= challenge_count <= 1024`, using arbitrary-precision integers. Invalid bounds are `profile_mismatch`. Define `effective_challenge_count = min(challenge_count, leaf_count)`: a short honest output opens all its checkpoints when fewer exist than the agreed maximum audit budget. This profile requires `commitment_profile = oi.merkle-sha256/0.1` and a non-null commitment. A Receipt with this assurance profile MUST report at least one output token. On Receipt validation, the receiver computes:
 
 ```text
 expected_leaf_count = ceil(output_tokens / checkpoint_stride_tokens)
@@ -139,8 +139,9 @@ seed = SHA-256(
   || randomness_value
 )
 
+maximum_draws = 64 * effective_challenge_count + 128
 i = 0
-while selected_count < challenge_count:
+while selected_count < effective_challenge_count and i < maximum_draws:
   candidate = UINT256(SHA-256(seed || U32BE(i)))
   limit = 2^256 - (2^256 mod leaf_count)
   i = i + 1
@@ -148,9 +149,12 @@ while selected_count < challenge_count:
   index = candidate mod leaf_count
   if index already selected: continue
   append index
+
+if selected_count != effective_challenge_count:
+  return temporarily_unavailable without state mutation
 ```
 
-Rejection sampling avoids modulo bias. Implementations MUST use unsigned big-endian integer interpretation.
+Rejection sampling avoids modulo bias. Implementations MUST use unsigned big-endian integer interpretation and the fixed draw bound above; partial selections and substituted seeds/rounds are invalid. The positive leaf and challenge bounds are checked before entering the loop, so every attempt terminates. Sampler/dependency failure is recorded as an incomplete research run, never a valid challenge result.
 
 An implementation MUST reject an unverifiable anchor or a source the provider could choose, grind, withhold, or predict before anchoring the commitment. The external anchor and randomness source for the first experiment remain explicit deployment choices, not universal protocol defaults.
 
@@ -241,6 +245,14 @@ The Verdict envelope issuer and payload `verifier` MUST equal the verifier ident
 
 ```json
 {
+  "receipt_digest": "sha256:<digest>",
+  "challenge_digest": "sha256:<digest>",
+  "opening_digest": "sha256:<digest>",
+  "assurance_profile": "oi.optimistic/0.2",
+  "verifier": "oi:<digest>",
+  "outcome": "valid",
+  "reason_code": "all_openings_valid",
+  "evidence_digest": "sha256:<digest>",
   "opening_acceptance_digest": "sha256:<digest>",
   "index_results": [
     {
@@ -253,7 +265,7 @@ The Verdict envelope issuer and payload `verifier` MUST equal the verifier ident
 }
 ```
 
-`opening_acceptance_digest` MUST identify the OpeningAcceptance accepted with this Opening. A Verdict cannot supply a new observation time or repair a missing/late acknowledgement. Results appear exactly once in numeric index order. The per-index reason codes are:
+This is the complete closed Verdict payload: all eight core common fields plus `opening_acceptance_digest` and `index_results` are REQUIRED; no other fields are permitted. `evidence_digest` MUST equal the core digest of JCS `index_results` in numeric index order. It is not interchangeable with an Opening digest or per-index evidence digest. `opening_acceptance_digest` MUST identify the OpeningAcceptance accepted with this Opening. A Verdict cannot supply a new observation time or repair a missing/late acknowledgement. Results cover all `effective_challenge_count` indices exactly once in numeric index order. The per-index reason codes are:
 
 ```text
 valid_opening
@@ -285,9 +297,9 @@ Laboratory and shadow deployments MUST use simulated settlement. The profile's c
 
 | Finalization reason | Required state and evidence | Earliest time | Outcome |
 | --- | --- | --- | --- |
-| `no_challenge` | `verification_pending`; ReceiptAcceptance digest | challenge deadline | `valid` |
+| `no_challenge` | `verification_pending`; ReceiptAcceptance digest | strictly after challenge deadline | `valid` |
 | `opening_timeout` | `disputed`; Challenge digest | strictly after opening deadline | `invalid` |
-| `verifier_timeout` | `opened`; OpeningAcceptance digest | verdict deadline | `indeterminate` |
+| `verifier_timeout` | `opened`; OpeningAcceptance digest | strictly after verdict deadline | `indeterminate` |
 | `valid_verdict` | `verdict_available`; valid Verdict digest | Verdict issuance | `valid` |
 | `invalid_verdict` | `verdict_available`; invalid Verdict digest | Verdict issuance | `invalid` |
 | `indeterminate_verdict` | `verdict_available`; indeterminate Verdict digest | Verdict issuance | `indeterminate` |
@@ -308,6 +320,8 @@ The signed settlement-policy `reason_map` MUST contain the union of the core, se
 ```
 
 Missing keys, extra keys, or different actions are `profile_mismatch` for this mock policy. Invalid Challenges and verifier failures MUST NOT become provider-invalid outcomes. `indeterminate_verdict` and `verifier_timeout` MUST map to `hold` in the baseline mock policy. Only a `verifier_timeout` hold may accept the first late Verdict, transition back to `verdict_available`, and receive a superseding Finalization; an `indeterminate_verdict` hold has no supersession in this profile version.
+
+An `indeterminate_verdict` hold intentionally leaves the simulated reservation locked and requires out-of-band laboratory/operator disposition. An operator may abandon and account for the experiment in its separate run ledger, but MUST NOT invent a SettlementInstruction, rewrite signed history, mark the protocol transaction `settled`, or reuse its purchase identity. This profile has no protocol-authorized release from that hold; bounded release or escalation is required before any real-funds deployment. The research report MUST retain the unresolved amount and failure reason.
 
 The profile does not define a token, stake asset, penalty size, challenger reward, or chain. Those parameters require measured audit cost and adversarial results.
 
@@ -350,6 +364,7 @@ Results are reported as detection curves, not a single accuracy number.
 - A valid Merkle path proves membership, not correct execution.
 - Sampling leaves unchallenged work unchecked.
 - One verifier is a trusted component even when it is deterministic.
+- An indeterminate-verdict hold has no protocol release and retains a simulated reservation for explicit operator disposition of the experiment; it cannot be used with real funds.
 - A provider may deny service by refusing to open; settlement handles the failure but cannot restore liveness.
 - Colluding providers, challengers, verifiers, randomness sources, or settlement adapters remain deployment threats.
 

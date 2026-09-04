@@ -87,6 +87,25 @@ function replay(store, object, now) {
   store.set(key, result);
   return result;
 }
+function checkReceiptAcceptance(receipt, agreement, acceptance) {
+  const observed = P(acceptance).receipt_observed_at;
+  assert(receipt.envelope.issued_at <= observed && observed <= P(agreement).receipt_deadline, 'deadline_exceeded');
+  assert(observed <= acceptance.envelope.issued_at && acceptance.envelope.issued_at <= P(agreement).acceptance_deadline, 'deadline_exceeded');
+}
+function challengeIndices(leafCount, budget, seed) {
+  const leaves = BigInt(leafCount), requested = BigInt(budget);
+  assert(leaves >= 1n && leaves <= 4294967296n && requested >= 1n && requested <= 1024n, 'profile_mismatch');
+  const effective = Number(requested < leaves ? requested : leaves);
+  const selected = new Set(), maximumDraws = 64 * effective + 128;
+  const limit = (1n << 256n) - (1n << 256n) % leaves;
+  for (let i = 0; i < maximumDraws && selected.size < effective; i++) {
+    const counter = Buffer.alloc(4); counter.writeUInt32BE(i);
+    const candidate = BigInt('0x' + createHash('sha256').update(seed).update(counter).digest('hex'));
+    if (candidate < limit) selected.add(String(candidate % leaves));
+  }
+  assert.equal(selected.size, effective, 'temporarily_unavailable');
+  return [...selected];
+}
 function observeOpening(state, issued, observed, deadline) {
   assert.equal(state.value, 'disputed');
   assert(issued <= observed && observed <= deadline, 'deadline_exceeded');
@@ -106,15 +125,16 @@ const execution = emit('execution_profile', provider, { profile_id: 'synthetic-o
 const capability = emit('capability_statement', provider, { capability_id: 'fixture', revision: '0', provider: provider.identity, service_profiles: ['oi.inference/0.2'], execution_profile_digests: [execution.digest], valid_from: timestamp(0), valid_until: timestamp(600) });
 const offer = emit('offer', provider, { offer_id: 'fixture-offer', revision: '0', provider: provider.identity, service_profile: 'oi.inference/0.2', capability_digest: capability.digest, terms: { execution_profile_digest: execution.digest, price: { asset: 'usd:6', input_per_million: '1000000', output_per_million: '1000000', minimum_charge: '1000', maximum_charge: '100000' }, limits: { maximum_input_tokens: '8', maximum_output_tokens: '2', maximum_concurrent_requests: '1' }, performance_claim: { maximum_ttft_ms: '500', minimum_output_tokens_per_second_milli: '1000' }, input_modes: ['inline'], output_modes: ['inline'] }, assurance_profiles: ['oi.signed-receipt/0.1'], valid_from: timestamp(0), valid_until: timestamp(600) });
 const policy = { profile: 'oi.settlement-policy.mock/0.2', finalizer: buyer.identity, instruction_issuer: buyer.identity, adapter: 'oi.settlement.mock/0.1', adapter_identity: adapter.identity, reason_map: signedReasons };
-const request = emit('request', buyer, { request_id: 'purchase-1', buyer: buyer.identity, service_profile: 'oi.inference/0.2', offer_digest: offer.digest, service_request: { execution_profile_digest: execution.digest, input: { mode: 'inline', media_type: 'application/openinfer-prompt+json', byte_length: String(Buffer.byteLength(jcs(source))), source_digest: hash(source), value: source, uri: null, encryption_profile: null, recipient_key_id: null }, rendered_input_digest: hash(renderedInput), generation: { maximum_output_tokens: '2', temperature_milli: '0', top_p_millionths: '1000000', seed: '0', stop: [] }, output_mode: 'inline' }, assurance_profile: 'oi.signed-receipt/0.1', assurance_parameters: {}, settlement_asset: 'usd:6', maximum_amount: '2000', settlement_policy: policy, minimum_commit_window_seconds: '10', minimum_receipt_window_seconds: '10', nonce: Buffer.alloc(16, 1).toString('base64url'), expires_at: timestamp(300) }, undefined, timestamp(300));
-const agreement = emit('agreement', provider, { agreement_id: 'agreement-1', request_digest: request.digest, offer_digest: offer.digest, buyer: buyer.identity, provider: provider.identity, service_profile: 'oi.inference/0.2', assurance_profile: 'oi.signed-receipt/0.1', accepted_amount: '2000', settlement_asset: 'usd:6', settlement_policy_digest: hash(policy), commit_deadline: timestamp(60), receipt_deadline: timestamp(120), verification_deadline: timestamp(120) });
+const request = emit('request', buyer, { request_id: 'purchase-1', buyer: buyer.identity, service_profile: 'oi.inference/0.2', offer_digest: offer.digest, service_request: { execution_profile_digest: execution.digest, input: { mode: 'inline', media_type: 'application/openinfer-prompt+json', byte_length: String(Buffer.byteLength(jcs(source))), source_digest: hash(source), value: source, uri: null, encryption_profile: null, recipient_key_id: null }, rendered_input_digest: hash(renderedInput), generation: { maximum_output_tokens: '2', temperature_milli: '0', top_p_millionths: '1000000', seed: '0', stop: [] }, output_mode: 'inline' }, assurance_profile: 'oi.signed-receipt/0.1', assurance_parameters: {}, settlement_asset: 'usd:6', maximum_amount: '2000', settlement_policy: policy, minimum_commit_window_seconds: '10', minimum_receipt_window_seconds: '10', minimum_acceptance_window_seconds: '10', nonce: Buffer.alloc(16, 1).toString('base64url'), expires_at: timestamp(300) }, undefined, timestamp(300));
+const agreement = emit('agreement', provider, { agreement_id: 'agreement-1', request_digest: request.digest, offer_digest: offer.digest, buyer: buyer.identity, provider: provider.identity, service_profile: 'oi.inference/0.2', assurance_profile: 'oi.signed-receipt/0.1', accepted_amount: '2000', settlement_asset: 'usd:6', settlement_policy_digest: hash(policy), commit_deadline: timestamp(60), receipt_deadline: timestamp(120), acceptance_deadline: timestamp(150), verification_deadline: timestamp(150) });
 const ledger = new Map();
 acceptAgreement(ledger, P(offer), P(request), agreement, '1');
 const usage = { input_tokens: '1', output_tokens: '1', total_tokens: '2', metering_profile: 'oi.inference.tokens/0.1' };
 const commitment = emit('execution_commitment', provider, { agreement_digest: agreement.digest, provider: provider.identity, service_profile: 'oi.inference/0.2', assurance_profile: 'oi.signed-receipt/0.1', execution_profile_digest: execution.digest, input_digest: hash(renderedInput), output_digest: hash(output), usage_digest: hash(usage), commitment_profile: null, commitment: null });
 const receipt = emit('receipt', provider, { agreement_digest: agreement.digest, commitment_digest: commitment.digest, provider: provider.identity, service_profile: 'oi.inference/0.2', execution_profile_digest: execution.digest, input_digest: hash(renderedInput), output_digest: hash(output), usage, performance: { queue_ms: '0', time_to_first_token_ms: '1', generation_ms: '1', output_tokens_per_second_milli: '1000000' }, assurance_profile: 'oi.signed-receipt/0.1', assurance_evidence: null, started_at: agreement.envelope.issued_at, completed_at: commitment.envelope.issued_at });
 checkCommitment(P(commitment), P(receipt), output);
-const acceptance = emit('receipt_acceptance', buyer, { agreement_digest: agreement.digest, receipt_digest: receipt.digest });
+const acceptance = emit('receipt_acceptance', buyer, { agreement_digest: agreement.digest, receipt_digest: receipt.digest, receipt_observed_at: receipt.envelope.issued_at });
+checkReceiptAcceptance(receipt, agreement, acceptance);
 const finalization = emit('finalization', buyer, { agreement_digest: agreement.digest, receipt_digest: receipt.digest, evidence_digest: acceptance.digest, revision: '0', supersedes_digest: null, outcome: 'valid', reason_code: 'receipt_accepted' });
 const paid = charge('1', '1', P(offer).terms.price);
 const instruction = emit('settlement_instruction', buyer, { agreement_digest: agreement.digest, finalization_digest: finalization.digest, instruction_revision: '0', supersedes_instruction_digest: null, outcome: 'pay', asset: 'usd:6', provider_amount: String(paid), buyer_amount: String(BigInt(P(agreement).accepted_amount) - paid), adapter: 'oi.settlement.mock/0.1', idempotency_key: `settlement:${finalization.digest}:0` });
@@ -131,16 +151,13 @@ assert.equal(acceptAgreement(ledger, P(offer), P(request), agreement, '1'), agre
 // R1: two separately signed acceptances cannot establish two purchases.
 const second = emit('agreement', provider, { ...P(agreement), agreement_id: 'agreement-2' });
 assert.throws(() => acceptAgreement(ledger, P(offer), P(request), second, '1'), /replay_conflict/);
-const competing = new Map();
-const results = await Promise.all([agreement, second].map(a => Promise.resolve().then(() => {
-  try { acceptAgreement(competing, P(offer), P(request), a, '1'); return 'accepted'; } catch { return 'conflict'; }
-})));
-assert.deepEqual(results.sort(), ['accepted', 'conflict']);
+// This is a sequential compare-and-set example, not a database race/locking test.
 // R2: reject both currency and scale changes at request and instruction boundaries.
 for (const asset of ['eur:6', 'usd:2']) {
   assert.throws(() => validateAssets(P(offer), { ...P(request), settlement_asset: asset }, { ...P(agreement), settlement_asset: asset }), /profile_mismatch/);
   assert.throws(() => validateAssets(P(offer), P(request), P(agreement), { ...P(instruction), asset }), /settlement_conflict/);
 }
+assert.throws(() => validateAssets(P(offer), P(request), { ...P(agreement), settlement_asset: 'eur:6' }), /profile_mismatch/);
 // R3: replacing output with the same token count cannot reuse a commitment.
 const substitute = { ...output, text: 'NO', token_ids: ['3'] };
 assert.throws(() => checkCommitment(P(commitment), { ...P(receipt), output_digest: hash(substitute) }, substitute), /profile_mismatch/);
@@ -182,5 +199,18 @@ assert.equal(P(commitment).commitment, null);
 assert.deepEqual(P(request).assurance_parameters, {});
 assert.equal(P(receipt).assurance_evidence, null);
 
+// Claude follow-ups: independent delivery/validation deadlines and bounded short-output sampling.
+const windowReceipt = { envelope: { issued_at: timestamp(119) } };
+const windowAgreement = { envelope: { payload: { receipt_deadline: timestamp(120), acceptance_deadline: timestamp(130) } } };
+const windowAcceptance = { envelope: { issued_at: timestamp(129), payload: { receipt_observed_at: timestamp(119) } } };
+checkReceiptAcceptance(windowReceipt, windowAgreement, windowAcceptance);
+assert.throws(() => checkReceiptAcceptance(windowReceipt, windowAgreement, { envelope: { ...windowAcceptance.envelope, issued_at: timestamp(131) } }), /deadline_exceeded/);
+assert.throws(() => checkReceiptAcceptance(windowReceipt, windowAgreement, { envelope: { ...windowAcceptance.envelope, payload: { receipt_observed_at: timestamp(121) } } }), /deadline_exceeded/);
+const seed = Buffer.alloc(32, 7);
+assert.deepEqual(challengeIndices('1', '2', seed), ['0']);
+assert.equal(challengeIndices('4', '2', seed).length, 2);
+for (const [leaves, count] of [['0', '2'], ['4294967297', '2'], ['1', '0'], ['2', '1025']]) {
+  assert.throws(() => challengeIndices(leaves, count, seed), /profile_mismatch/);
+}
 if (process.argv.includes('--example')) console.log(JSON.stringify(transcript, null, 2));
-else console.log(`Passed eight review regression groups and ${transcript.objects.length} signed mock-transcript objects. Not a full conformance suite.`);
+else console.log(`Passed eight review regression groups, two follow-up groups, and ${transcript.objects.length} signed mock-transcript objects. Not a full conformance suite.`);

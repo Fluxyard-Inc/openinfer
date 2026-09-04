@@ -56,7 +56,7 @@ Use paired uninstrumented and instrumented runs on the same corpus; separate col
 2. lower precision or aggressive quantization;
 3. skipped transformer layers;
 4. fewer experts or altered MoE routing;
-5. a smaller substitute model; and
+5. a smaller substitute model;
 6. selective cheating that becomes honest when a request appears likely to be audited;
 7. a fixed trace paired with a different same-length output or changed usage after anchoring; and
 8. fabricated internally consistent checkpoints disconnected from the request or returned token sequence.

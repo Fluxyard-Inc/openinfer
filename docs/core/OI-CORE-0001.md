@@ -60,6 +60,8 @@ JSON numbers MUST NOT appear in signed payloads. Decimal prices, quantities, and
 
 `Timestamp` is `YYYY-MM-DDTHH:MM:SSZ`. Fractional seconds and non-UTC offsets are invalid in `oi-core/0.2`.
 
+Envelope expiry is exclusive: a first submission requires receiver time `< expires_at`. Agreement deadlines are inclusive; the corresponding timeout can be finalized only strictly after the deadline. Accepted replay and historical-reference handling follow §§9–10.
+
 `NetworkId` matches `[a-z0-9][a-z0-9.-]{0,63}`.
 
 `ProfileId` matches `[a-z0-9][a-z0-9.-]*/[0-9]+\.[0-9]+`.
@@ -215,6 +217,7 @@ The identity tuple `(provider, offer_id, revision)` MUST map to one envelope dig
 | `settlement_policy` | object | Signed policy described below |
 | `minimum_commit_window_seconds` | `UIntString` | Buyer-required time after agreement issuance |
 | `minimum_receipt_window_seconds` | `UIntString` | Buyer-required time after commitment deadline |
+| `minimum_acceptance_window_seconds` | `PositiveUIntString` | Buyer-required validation time after receipt delivery deadline |
 | `nonce` | string | At least 128 bits of random data, base64url |
 | `expires_at` | `Timestamp` | Request acceptance deadline |
 
@@ -251,9 +254,10 @@ The identity tuple `(provider, offer_id, revision)` MUST map to one envelope dig
 | `settlement_policy_digest` | digest | Core digest of the exact request policy object |
 | `commit_deadline` | `Timestamp` | Latest commitment time |
 | `receipt_deadline` | `Timestamp` | Latest receipt time |
+| `acceptance_deadline` | `Timestamp` | Latest ReceiptAcceptance issuance |
 | `verification_deadline` | `Timestamp` | Latest ordinary verification time |
 
-The signed request represents the buyer's intent. The provider-signed agreement represents acceptance. The Agreement envelope `issued_at` MUST be no later than Request `expires_at`. `commit_deadline` MUST be at least Agreement `issued_at + minimum_commit_window_seconds`; `receipt_deadline` MUST be at least `commit_deadline + minimum_receipt_window_seconds`; and `verification_deadline` MUST satisfy every additional minimum window defined by the assurance profile. An agreement MUST NOT alter service request, assurance parameters, or settlement policy; it binds them by digest.
+The signed request represents the buyer's intent. The provider-signed agreement represents acceptance. The Agreement envelope `issued_at` MUST be strictly before Request `expires_at`. `commit_deadline` MUST be at least Agreement `issued_at + minimum_commit_window_seconds`; `receipt_deadline` MUST be at least `commit_deadline + minimum_receipt_window_seconds`; `acceptance_deadline` MUST be at least `receipt_deadline + minimum_acceptance_window_seconds`; and `verification_deadline` MUST satisfy every additional minimum window defined by the assurance profile. An agreement MUST NOT alter service request, assurance parameters, or settlement policy; it binds them by digest.
 
 The transaction identity is `(network_id, buyer, request_id)`. It MUST bind one signed Request digest and at most one accepted Agreement digest, including after timeout or settlement. The tuple `(network_id, provider, agreement_id)` MUST also bind one Agreement digest. Re-signing an agreement with a new sequence does not authorize another purchase: a receiver MUST return the stored result for the exact accepted agreement and return `replay_conflict` for a different Request or Agreement under either identity. A replacement purchase requires a fresh buyer-signed Request with a new `request_id`.
 
@@ -303,11 +307,12 @@ The finalizer acknowledges receipt delivery with:
 ```json
 {
   "agreement_digest": "sha256:<digest>",
-  "receipt_digest": "sha256:<digest>"
+  "receipt_digest": "sha256:<digest>",
+  "receipt_observed_at": "2026-09-04T00:02:00Z"
 }
 ```
 
-The envelope issuer MUST equal `settlement_policy.finalizer`. Its envelope `issued_at` is the reproducible start of assurance windows. It MUST be no earlier than the Receipt envelope `issued_at` and no later than `Agreement.receipt_deadline`.
+The envelope issuer MUST equal `settlement_policy.finalizer`. The finalizer records complete delivery of the Receipt and all service-required delivery bytes with its own clock in `receipt_observed_at`; it MUST NOT use a provider-supplied observation time. Receipt validation may continue during the acceptance window. A receiver MUST verify `Receipt.issued_at <= receipt_observed_at <= Agreement.receipt_deadline` and `receipt_observed_at <= ReceiptAcceptance.issued_at <= Agreement.acceptance_deadline`. An acknowledgement is issued only after successful validation. Its envelope `issued_at` is the reproducible start of assurance windows. Late delivery or acknowledgement returns `deadline_exceeded` without a state transition. The finalizer's honest observation remains a baseline trust assumption.
 
 ### 7.8 Assurance objects
 
@@ -348,7 +353,7 @@ Deadlines and verdicts do not directly create a final state. The identity named 
 
 `outcome` is `valid`, `invalid`, or `indeterminate`. Finalization reason codes form a closed registry: this core defines `commitment_timeout` and `receipt_timeout`; each active service and assurance profile defines its additional codes, required prior state, earliest permissible time, required evidence, and outcome. A receiver MUST reject a Finalization unless its envelope issuer is `settlement_policy.finalizer` and every registered precondition is reproducible from accepted signed objects.
 
-`commitment_timeout` requires state `agreed`, outcome `invalid`, envelope `issued_at >= Agreement.commit_deadline`, and null receipt and evidence digests. `receipt_timeout` requires state `committed`, outcome `invalid`, envelope `issued_at >= Agreement.receipt_deadline`, and null receipt and evidence digests. Reasons reachable after Receipt acceptance require a non-null `receipt_digest`; verdict reasons require `evidence_digest` to identify the accepted Verdict.
+`commitment_timeout` requires state `agreed`, outcome `invalid`, envelope `issued_at > Agreement.commit_deadline`, and null receipt and evidence digests. `receipt_timeout` requires state `committed` (no valid Receipt/ReceiptAcceptance pair), outcome `invalid`, envelope `issued_at > Agreement.acceptance_deadline`, and null receipt and evidence digests. This waits for validation of a timely delivered Receipt; observing unvalidated bytes alone does not accept it or prevent the eventual timeout. Reasons reachable after Receipt acceptance require a non-null `receipt_digest`; verdict reasons require `evidence_digest` to identify the accepted Verdict.
 
 Revision `0` MUST use null `supersedes_digest`. A later revision is valid only when it supersedes the current held Finalization: it increments the previous revision by one, identifies that Finalization in `supersedes_digest`, and satisfies a supersession rule defined by the active profile. The tuple `(agreement_digest, finalizer, revision)` maps to one digest; conflicting content is `settlement_conflict`.
 
