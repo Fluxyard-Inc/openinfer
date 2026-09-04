@@ -33,15 +33,18 @@ Passing sampled challenges does not prove that every unchallenged operation was 
   "challenge_source": {
     "profile": "oi.randomness.external/0.1",
     "source_id": "<agreed source>",
-    "minimum_round": "12345"
+    "anchor_profile": "oi.anchor.external/0.1",
+    "minimum_round": "12345",
+    "round_rule": "first_round_after_anchor"
   },
   "challenge_count": "2",
-  "challenge_window_ms": "60000",
-  "opening_window_ms": "120000",
+  "challenge_window_seconds": "60",
+  "opening_window_seconds": "120",
+  "clock_skew_seconds": "5",
+  "challenger": "oi:<digest>",
   "verifier_profile": "oi.verifier.moe-transition/0.1",
-  "verdict_policy": "single-reference-verifier",
-  "on_missing_opening": "invalid",
-  "on_indeterminate_verdict": "hold"
+  "verifier": "oi:<digest>",
+  "verdict_policy": "single-reference-verifier"
 }
 ```
 
@@ -97,16 +100,29 @@ The `ExecutionCommitment.commitment` object is:
 
 The root proves only that the provider did not change the committed checkpoint set after signing.
 
-## 6. Post-commit randomness
+## 6. Commitment anchoring and randomness
 
-The challenge source produces `randomness_value` plus evidence identifying the source and round. The source evidence is profile-specific but MUST be independently retrievable and MUST become fixed after the execution commitment was issued.
+Before the selected randomness round becomes knowable, the provider MUST submit the signed execution-commitment digest to the agreed anchor profile. `Receipt.assurance_evidence` includes the resulting anchor:
+
+```json
+{
+  "commitment_anchor": {
+    "profile": "oi.anchor.external/0.1",
+    "commitment_digest": "sha256:<digest>",
+    "position": "738188",
+    "evidence_digest": "sha256:<digest>"
+  }
+}
+```
+
+The challenge source produces `randomness_value` plus independently retrievable evidence identifying its source and round. The selected round MUST be the first source round both at or above `minimum_round` and strictly after the anchor position according to the source profile. No participant may substitute a later eligible round. The source profile MUST define a total ordering between anchor positions and rounds and MUST guarantee that the selected value was unpredictable when the anchor was accepted.
 
 Challenge indices are derived deterministically:
 
 ```text
 seed = SHA-256(
   UTF8("openinfer-challenge-v0.1\n")
-  || receipt_digest_32_bytes
+  || commitment_digest_32_bytes
   || randomness_value
 )
 
@@ -123,7 +139,7 @@ while selected_count < challenge_count:
 
 `challenge_count` MUST NOT exceed `leaf_count`. Rejection sampling avoids modulo bias. Implementations MUST use unsigned big-endian integer interpretation.
 
-An implementation MUST reject a source the provider could choose, grind, withhold, or predict before signing the commitment. The external randomness source for the first experiment remains an explicit deployment choice, not a universal protocol default.
+An implementation MUST reject an unverifiable anchor or a source the provider could choose, grind, withhold, or predict before anchoring the commitment. The external anchor and randomness source for the first experiment remain explicit deployment choices, not universal protocol defaults.
 
 ## 7. Challenge
 
@@ -134,6 +150,7 @@ A `Challenge` payload is:
   "receipt_digest": "sha256:<digest>",
   "commitment_digest": "sha256:<digest>",
   "assurance_profile": "oi.optimistic/0.1",
+  "anchor_evidence_digest": "sha256:<digest>",
   "randomness_source": "oi.randomness.external/0.1",
   "randomness_round": "12345",
   "randomness_value": "<base64url bytes>",
@@ -143,7 +160,7 @@ A `Challenge` payload is:
 }
 ```
 
-The challenger MUST recompute `selected_indices` from the receipt digest, randomness, leaf count, and accepted challenge count. The provider MUST reject a challenge containing a different set.
+The Challenge envelope issuer MUST equal the agreed `challenger`. `challenge_deadline` is the earlier of `Receipt.completed_at + challenge_window_seconds` and `Agreement.verification_deadline`. `opening_deadline` is the earlier of the Challenge envelope `issued_at + opening_window_seconds` and `Agreement.verification_deadline`. A receiver MUST verify the anchor, deterministic eligible round, source evidence, selected indices, both deadlines, and that receipt and Challenge envelope timestamps were within `clock_skew_seconds` at their respective acceptance times. Any failure returns core `invalid_challenge` and MUST NOT change transaction state or authorize settlement against the provider.
 
 ## 8. Opening
 
@@ -172,7 +189,7 @@ An `Opening` payload is:
 }
 ```
 
-Every requested index appears exactly once. The opening MUST arrive by the agreed deadline. Replay input may be an encrypted reference when the verifier has the accepted decryption capability.
+The Opening envelope issuer MUST equal the Agreement provider. Every requested index appears exactly once. The opening MUST arrive by the agreed deadline. Replay input may be an encrypted reference when the verifier has the accepted decryption capability. A missing opening produces no Verdict; the authorized finalizer handles `opening_timeout` under the signed settlement policy.
 
 ## 9. Verification algorithm
 
@@ -191,6 +208,8 @@ The verifier MUST process all selected indices even after finding one invalid op
 
 ## 10. Verdicts
 
+The Verdict envelope issuer and payload `verifier` MUST equal the verifier identity accepted in the agreement.
+
 The profile reason codes are:
 
 ```text
@@ -203,8 +222,6 @@ invalid_expert_selection
 invalid_expert_output
 invalid_transition
 missing_replay_context
-opening_timeout
-randomness_invalid
 verifier_error
 numeric_indeterminate
 ```
@@ -214,19 +231,14 @@ Reason codes map to core outcomes:
 | Reason | Outcome |
 | --- | --- |
 | `valid_opening` for every index | `valid` |
-| Any invalid membership, profile, routing, expert, transition, timeout, or randomness result | `invalid` |
+| Any invalid membership, profile, routing, expert, or transition result | `invalid` |
 | `verifier_error` or `numeric_indeterminate` | `indeterminate` |
 
 Free-form explanations and logs may accompany the verdict but MUST NOT determine settlement.
 
 ## 11. Settlement behavior
 
-Laboratory and shadow deployments MUST use simulated settlement. Later deployments bind outcome mapping in the agreement before execution:
-
-- `valid` may authorize provider payment after the challenge window;
-- `invalid` may authorize refund and a profile-defined penalty;
-- `indeterminate` defaults to `hold`; and
-- missing opening follows `on_missing_opening`.
+Laboratory and shadow deployments MUST use simulated settlement. Before execution, the Request settlement policy MUST bind mappings for `valid`, `invalid`, `indeterminate`, `no_challenge`, `opening_timeout`, and `verifier_timeout`. After the challenge deadline, the authorized finalizer may emit `no_challenge` only if no valid Challenge was accepted. After the opening deadline, it may emit `opening_timeout` only if a valid Challenge was accepted and no valid Opening was accepted. After the verification deadline, it may emit `verifier_timeout` only if a valid Opening was accepted and no valid Verdict was accepted. Invalid Challenges and verifier failures MUST NOT become provider-invalid outcomes.
 
 The profile does not define a token, stake asset, penalty size, challenger reward, or chain. Those parameters require measured audit cost and adversarial results.
 

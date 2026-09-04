@@ -90,13 +90,14 @@ All prices are integer asset minor units per one million tokens. Performance val
     "mode": "inline",
     "media_type": "application/openinfer-prompt+json",
     "byte_length": "1532",
-    "digest": "sha256:<digest>",
+    "source_digest": "sha256:<digest>",
     "value": {
       "messages": [
         {"role": "user", "content": "Explain the result."}
       ]
     }
   },
+  "rendered_input_digest": "sha256:<digest>",
   "generation": {
     "maximum_output_tokens": "512",
     "temperature_milli": "700",
@@ -110,10 +111,10 @@ All prices are integer asset minor units per one million tokens. Performance val
 
 ### 5.1 Input modes
 
-- `inline` includes `value`; its JCS digest MUST equal `input.digest`.
-- `encrypted_ref` omits `value` and includes `uri`, `encryption_profile`, and `recipient_key_id`. The decrypted bytes MUST match `input.digest`.
+- `inline` includes `value`; `source_bytes = UTF8(JCS(value))`, `byte_length` is the length of `source_bytes`, and its core digest MUST equal `input.source_digest`.
+- `encrypted_ref` omits `value` and includes `uri`, `encryption_profile`, and `recipient_key_id`. The decrypted canonical source bytes MUST match `byte_length` and `input.source_digest`.
 
-The input digest commits to the profile-defined rendered input, not merely the user-visible message text.
+The committed tokenizer and prompt template render the source into `{ "media_type": "application/openinfer-token-ids+json", "token_ids": [...] }`. `rendered_input_digest` is the core digest of that JCS object. `ExecutionCommitment.input_digest` and `Receipt.input_digest` MUST equal `rendered_input_digest`; `source_digest` separately commits to the buyer-supplied source.
 
 ### 5.2 Generation parameters
 
@@ -223,7 +224,7 @@ buyer_cancelled
 provider_error
 ```
 
-The agreement and assurance profile map these reasons to `pay`, `refund`, `split`, or `hold`. The service profile does not introduce slashing.
+The signed settlement policy maps these reasons to `pay`, `refund`, `split`, or `hold`. The service profile does not introduce slashing.
 
 ## 12. Privacy and security
 
