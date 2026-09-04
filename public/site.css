@@ -262,20 +262,9 @@ a { color: inherit; }
   align-self: start;
 }
 
-.contents h2 {
-  max-width: 11ch;
-  margin: 2rem 0 1.5rem;
-  font-size: var(--text-heading);
-  font-weight: 550;
-  letter-spacing: -.035em;
-  line-height: 1.02;
-}
 
-.contents-intro > p:last-child {
-  max-width: 27rem;
-  margin: 0;
-  color: var(--stone);
-}
+
+
 
 .contents-list {
   margin: 0;
