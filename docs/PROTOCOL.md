@@ -1,8 +1,13 @@
-# OpenInfer technical draft v0.1
+# OpenInfer Protocol Draft 0001
 
-Status: **research draft**  
-Audience: implementers, providers, verifier authors, and reviewers  
-Last updated: 2026-09-04
+| Field | Value |
+| --- | --- |
+| Document | **OI-DRAFT-0001** |
+| Title | **Core transaction and verification protocol** |
+| Status | **Research Draft** |
+| Version | **0.1** |
+| Audience | **Implementers, providers, verifier authors, and reviewers** |
+| Last updated | **2026-09-04** |
 
 This document turns the OpenInfer manifesto into a testable protocol proposal. It is not a final standard and does not claim that trust-minimized large-model inference has been solved. Sections marked **proposed** describe a direction to test. Sections marked **inherited from Fluxyard** describe patterns already implemented in Fluxyard's trusted-market control plane and suitable for reuse after adaptation to an open network.
 
