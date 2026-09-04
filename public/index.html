@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A research proposal for software to purchase machine services through signed agreements, accountable receipts, and explicit verification policies.">
+  <meta name="theme-color" content="#f5f2ec">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OpenInfer — An open protocol for the machine economy.">
+  <meta property="og:description" content="The transaction protocol, its trust boundaries, and the experiments needed to test inexpensive inference verification.">
+  <meta property="og:url" content="https://openinfer.network/">
+  <title>OpenInfer — An open protocol for the machine economy.</title>
+  <link rel="canonical" href="https://openinfer.network/">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="site.css?v=publication5">
+</head>
+<body>
+  <a class="skip-link" href="#vision">Skip to the paper</a>
+  <header class="site-header" id="top">
+    <a class="mark" href="#top" aria-label="OpenInfer home"><span>O/I</span> OpenInfer</a>
+    <nav aria-label="Primary navigation">
+      <a href="#contents">Contents</a>
+      <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/PROTOCOL.md">Protocol draft <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+  <main>
+    <header class="paper-header">
+      <p class="metadata">Research paper 001 · <time datetime="2026-09-04">4 September 2026</time> · Fluxyard</p>
+      <h1>OpenInfer</h1>
+      <p class="subtitle">An open protocol for the machine economy.</p>
+      <p>OpenInfer proposes a common way for software to purchase machine services from unfamiliar providers. It separates the transaction—offers, agreements, receipts, and settlement—from the harder question of how to verify the work.</p>
+      <p class="status-note"><strong>Current status.</strong> Draft 0001 specifies a prototype baseline for buyer-accepted signed receipts and simulated settlement. Optimistic execution verification remains experimental. Trust-minimized inference, real stake, and slashing have not been demonstrated.</p>
+    </header>
+
+    <nav class="contents" id="contents" aria-label="Contents">
+      <p class="section-label">In this paper</p>
+      <ol>
+        <li><a href="#vision"><span>01</span> Problem and thesis</a></li>
+        <li><a href="#protocol"><span>02</span> One transaction</a></li>
+        <li><a href="#verification"><span>03</span> Verification and its limits</a></li>
+        <li><a href="#roadmap"><span>04</span> Research and implications</a></li>
+      </ol>
+    </nav>
+
+    <section class="paper-section" id="vision" aria-labelledby="vision-title">
+      <p class="section-label">01 / Problem and thesis</p>
+      <h2 id="vision-title">Purchasing beyond a fixed vendor list</h2>
+      <p>Agents can already call tools and choose among services. Their purchasing authority usually comes from accounts, credentials, budgets, and vendors arranged by people. The difficult step is not choosing another endpoint: it is agreeing to bounded terms with a new counterparty, deciding what counts as delivery, and recovering when that counterparty fails.</p>
+      <p>Established providers, contracts, and conventional billing often solve this well. OpenInfer is worth pursuing only where a shared transaction format can reduce repeated integration and coordination costs without replacing them with greater verification, capital, or operational costs.</p>
+
+      <h3 id="research-title">The central research question</h3>
+      <p>Can an inference provider commit to evidence of its execution cheaply enough that unpredictable audits make dishonest computation uneconomic, at a small fraction of the cost of repeating the request?</p>
+      <p>This is a hypothesis, not a property of the current protocol. A signature makes a claim attributable; it does not make the claim true. The research must establish whether sampled evidence is meaningfully connected to the delivered output, whether honest implementations agree, and whether useful cheating can be distinguished from normal numerical variation.</p>
+
+      <h3>Why begin with inference?</h3>
+      <p>Open-model inference gives the proposal a bounded first service: a specified model, a request, output tokens, measurable usage, and a price. Start with one accessible model and a fixed execution profile. Larger Mixture-of-Experts models are a later scaling question, not a prerequisite for the first experiment.</p>
+      <p>The protocol can still be useful as accountable transaction infrastructure if inexpensive execution verification fails. That narrower outcome should be evaluated on its own merits.</p>
+    </section>
+
+    <section class="paper-section" id="protocol" aria-labelledby="protocol-title">
+      <p class="section-label">02 / One transaction</p>
+      <h2 id="protocol-title">From an offer to an accountable outcome</h2>
+      <p>Consider a research agent buying one inference request to extract facts from a filing. Its owner sets the spending limit and acceptable providers. The following is an illustrative purchase, not a live offer or a claim about available capacity.</p>
+      <ol class="transaction-steps">
+        <li><h3>Discover an offer</h3><p>The agent finds a signed offer describing the model and execution profile, input and output prices, limits, and supported assurance. A registry helps discovery; it does not make the provider trustworthy.</p></li>
+        <li><h3>Agree and reserve</h3><p>The buyer selects the exact offer revision, output limit, deadlines, and acceptance policy. Before execution, the reservation must cover the permitted work in the agreed asset and unit scale. One buyer request binds to one accepted agreement; retrying is not another purchase.</p></li>
+        <li><h3>Execute and record</h3><p>The provider runs the request off-chain, commits the output and usage digests, and signs a receipt linked to the agreement. This execution commitment follows the work; accepting commercial terms happens before it. Trace commitments are additional evidence only for profiles that require them.</p></li>
+        <li><h3>Check delivery</h3><p>In the <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/profiles/OI-PROFILE-SIGNED-RECEIPT-0001.md">signed-receipt baseline</a>, the buyer checks the delivered bytes and usage under the selected profile, then signs an acceptance. The buyer is also the trusted finalizer. This does not independently establish which model ran.</p></li>
+        <li><h3>Finalize and settle</h3><p>A successful accepted receipt produces a payment instruction in the simulated ledger. Missing delivery follows explicit timeout and refund rules. Replays return the accepted result instead of charging again; changed messages are rejected. A real payment adapter is separate work.</p></li>
+      </ol>
+
+      <h3>No privileged router</h3>
+      <p>Fluxyard may provide the first marketplace and gateway, but a buyer should be able to use another gateway or inspect offers directly. Signed objects carry the accepted terms across those choices. The draft still names trusted finalizers and settlement adapters; interchangeable clients do not by themselves make a deployment decentralized.</p>
+      <figure class="protocol-diagram market-diagram" role="img" aria-labelledby="market-diagram-caption">
+        <svg class="diagram-desktop" viewBox="0 0 960 390" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="market-arrow-desktop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 8 4 0 8Z"></path>
+            </marker>
+          </defs>
+          <rect class="diagram-node diagram-node-primary" x="290" y="30" width="380" height="100" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="480" y="69" text-anchor="middle">INDEPENDENT PROVIDERS</text>
+          <text class="diagram-detail diagram-detail-inverse" x="480" y="98" text-anchor="middle">Signed offers · common transaction rules</text>
+
+          <path class="diagram-line" d="M480 130V215M160 215H800"></path>
+          <path class="diagram-line diagram-arrow" d="M160 215V265" marker-end="url(#market-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M480 215V265" marker-end="url(#market-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M800 215V265" marker-end="url(#market-arrow-desktop)"></path>
+
+          <rect class="diagram-node" x="40" y="270" width="240" height="88" rx="3"></rect>
+          <text class="diagram-title" x="160" y="307" text-anchor="middle">FLUXYARD</text>
+          <text class="diagram-detail" x="160" y="333" text-anchor="middle">gateway + router</text>
+
+          <rect class="diagram-node" x="360" y="270" width="240" height="88" rx="3"></rect>
+          <text class="diagram-title" x="480" y="307" text-anchor="middle">AGENT A</text>
+          <text class="diagram-detail" x="480" y="333" text-anchor="middle">direct buyer</text>
+
+          <rect class="diagram-node" x="680" y="270" width="240" height="88" rx="3"></rect>
+          <text class="diagram-title" x="800" y="307" text-anchor="middle">AGENT B</text>
+          <text class="diagram-detail" x="800" y="333" text-anchor="middle">direct buyer</text>
+        </svg>
+
+        <svg class="diagram-mobile" viewBox="0 0 360 550" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="market-arrow-mobile" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 8 4 0 8Z"></path>
+            </marker>
+          </defs>
+          <rect class="diagram-node diagram-node-primary" x="20" y="20" width="320" height="110" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="180" y="55" text-anchor="middle">INDEPENDENT PROVIDERS</text>
+          <text class="diagram-detail diagram-detail-inverse" x="180" y="82" text-anchor="middle">Signed offers</text>
+          <text class="diagram-detail diagram-detail-inverse" x="180" y="103" text-anchor="middle">common transaction rules</text>
+
+          <path class="diagram-line" d="M180 130V150H25V482"></path>
+          <path class="diagram-line diagram-arrow" d="M25 214H55" marker-end="url(#market-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M25 344H55" marker-end="url(#market-arrow-mobile)"></path>
+          <path class="diagram-line diagram-arrow" d="M25 474H55" marker-end="url(#market-arrow-mobile)"></path>
+
+          <rect class="diagram-node" x="55" y="170" width="285" height="88" rx="3"></rect>
+          <text class="diagram-title" x="197.5" y="207" text-anchor="middle">FLUXYARD</text>
+          <text class="diagram-detail" x="197.5" y="233" text-anchor="middle">gateway + router</text>
+
+          <rect class="diagram-node" x="55" y="300" width="285" height="88" rx="3"></rect>
+          <text class="diagram-title" x="197.5" y="337" text-anchor="middle">AGENT A</text>
+          <text class="diagram-detail" x="197.5" y="363" text-anchor="middle">direct buyer</text>
+
+          <rect class="diagram-node" x="55" y="430" width="285" height="88" rx="3"></rect>
+          <text class="diagram-title" x="197.5" y="467" text-anchor="middle">AGENT B</text>
+          <text class="diagram-detail" x="197.5" y="493" text-anchor="middle">direct buyer</text>
+        </svg>
+        <figcaption id="market-diagram-caption">Proposed discovery topology. Providers expose offers to competing gateways and direct buyers; the lines show access to offers, not a central execution path. Fluxyard is one possible client.</figcaption>
+      </figure>
+      <p>Inference remains a direct buyer-to-provider interaction. The core standardizes identity, signed objects, replay handling, and outcomes; service profiles define the work and assurance profiles define the required evidence. A blockchain is not required to run the initial experiments. Settlement rails do not perform the computation.</p>
+    </section>
+
+    <section class="paper-section" id="verification" aria-labelledby="verification-title">
+      <p class="section-label">03 / Verification and its limits</p>
+      <h2 id="verification-title">A receipt is a claim, not proof of execution</h2>
+      <p>Usage, artifact identity, execution, performance, and provider history are different questions. Counting delivered tokens can check a usage claim without proving that the advertised weights generated them. Latency is partly an observation at the buyer; a history of receipts is not automatically a reliable reputation score.</p>
+      <p>Nor does faithful execution prove that an answer is true, useful, or safe to act on. A research agent still needs sources and task-level evaluation. Purchasing assurance about computation cannot replace judgment about its result.</p>
+
+      <table class="assurance-table" role="table">
+        <caption>Assurance mechanisms have different trust assumptions—not universal ranks.</caption>
+        <thead><tr><th scope="col">Mechanism</th><th scope="col">What it can establish</th><th scope="col">Boundary</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Signed receipt + buyer checks</th><td data-label="Evidence">Attribution, agreed terms, delivered bytes, and profile-defined usage checks.</td><td data-label="Boundary">Specified baseline; trusts the buyer/finalizer. No execution proof.</td></tr>
+          <tr><th scope="row">Optimistic trace challenge</th><td data-label="Evidence">Whether selected committed evidence passes a specified verifier.</td><td data-label="Boundary">Experimental; output linkage, detection, privacy, and cost remain research questions.</td></tr>
+          <tr><th scope="row">TEE attestation</th><td data-label="Evidence">Execution within an attested hardware-backed environment.</td><td data-label="Boundary">Possible future profile; depends on hardware, attestation, and implementation assumptions.</td></tr>
+          <tr><th scope="row">Cryptographic proof</th><td data-label="Evidence">A formally encoded computation statement, under the proof system’s assumptions.</td><td data-label="Boundary">Possible future profile; statement coverage and practical proving cost must be established.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="optimistic-title">The experimental audit path</h3>
+      <p>In the experimental design, the provider commits to the output, usage, and a trace before audit randomness is available. A challenge selects evidence to open; a verifier checks it against the agreed execution profile. An internally consistent trace is insufficient if it can be fabricated independently of the request and returned output.</p>
+      <p>The diagram shows the experiment’s decision paths, not observed network behavior. An unaudited receipt may proceed under the agreed policy after the challenge window; that is an economic choice, not a proof that the request was executed faithfully.</p>
+      <figure class="protocol-diagram verification-diagram" role="img" aria-labelledby="verification-diagram-caption">
+<svg class="diagram-desktop" viewBox="0 0 760 570" aria-hidden="true" focusable="false">
+<defs><marker id="audit-desktop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"></path></marker></defs>
+<rect class="diagram-node " x="225" y="20" width="310" height="60" rx="3"></rect>
+<text class="diagram-title" x="380" y="46" text-anchor="middle">EXECUTE + COMMIT</text>
+<text class="diagram-detail" x="380" y="67" text-anchor="middle">bind output, usage, and trace</text>
+<path class="diagram-line" d="M380 80V102" marker-end="url(#audit-desktop)"></path>
+<rect class="diagram-node " x="225" y="107" width="310" height="60" rx="3"></rect>
+<text class="diagram-title" x="380" y="133" text-anchor="middle">ANCHOR + SIGN RECEIPT</text>
+<text class="diagram-detail" x="380" y="154" text-anchor="middle">commitment fixed before audit</text>
+<path class="diagram-line" d="M380 167V189" marker-end="url(#audit-desktop)"></path>
+<rect class="diagram-node " x="225" y="194" width="310" height="60" rx="3"></rect>
+<text class="diagram-title" x="380" y="220" text-anchor="middle">POST-COMMIT RANDOMNESS</text>
+<text class="diagram-detail" x="380" y="241" text-anchor="middle">select whether and where to audit</text>
+<path class="diagram-line" d="M380 254V280M135 280H490"></path>
+<path class="diagram-line" d="M135 280V305" marker-end="url(#audit-desktop)"></path><path class="diagram-line" d="M490 280V305" marker-end="url(#audit-desktop)"></path>
+<rect class="diagram-node " x="25" y="310" width="220" height="60" rx="3"></rect>
+<text class="diagram-title" x="135" y="336" text-anchor="middle">NO CHALLENGE</text>
+<text class="diagram-detail" x="135" y="357" text-anchor="middle">wait for challenge window</text>
+<rect class="diagram-node " x="355" y="310" width="270" height="60" rx="3"></rect>
+<text class="diagram-title" x="490" y="336" text-anchor="middle">OPEN + VERIFY</text>
+<text class="diagram-detail" x="490" y="357" text-anchor="middle">check the selected evidence</text>
+<path class="diagram-line" d="M135 370V465" marker-end="url(#audit-desktop)"></path>
+<rect class="diagram-node diagram-node-terminal" x="25" y="470" width="220" height="65" rx="3"></rect>
+<text class="diagram-title" x="135" y="498.5" text-anchor="middle">PAY</text>
+<text class="diagram-detail" x="135" y="519.5" text-anchor="middle">simulated settlement</text>
+<path class="diagram-line" d="M490 370V410M325 410H655"></path>
+<path class="diagram-line" d="M325 410V465" marker-end="url(#audit-desktop)"></path><path class="diagram-line" d="M490 410V465" marker-end="url(#audit-desktop)"></path><path class="diagram-line" d="M655 410V465" marker-end="url(#audit-desktop)"></path>
+<rect class="diagram-node diagram-node-terminal" x="255" y="470" width="140" height="65" rx="3"></rect>
+<text class="diagram-title" x="325" y="498.5" text-anchor="middle">VALID</text>
+<text class="diagram-detail" x="325" y="519.5" text-anchor="middle">pay</text>
+<rect class="diagram-node " x="420" y="470" width="140" height="65" rx="3"></rect>
+<text class="diagram-title" x="490" y="498.5" text-anchor="middle">INVALID</text>
+<text class="diagram-detail" x="490" y="519.5" text-anchor="middle">refund</text>
+<rect class="diagram-node " x="585" y="470" width="140" height="65" rx="3"></rect>
+<text class="diagram-title" x="655" y="498.5" text-anchor="middle">UNCLEAR</text>
+<text class="diagram-detail" x="655" y="519.5" text-anchor="middle">hold</text>
+</svg>
+<svg class="diagram-mobile" viewBox="0 0 360 810" aria-hidden="true" focusable="false">
+<defs><marker id="audit-mobile" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"></path></marker></defs>
+<rect class="diagram-node " x="20" y="20" width="320" height="60" rx="3"></rect>
+<text class="diagram-title" x="180" y="46" text-anchor="middle">EXECUTE + COMMIT</text>
+<text class="diagram-detail" x="180" y="67" text-anchor="middle">bind output, usage, and trace</text>
+<path class="diagram-line" d="M180 80V102" marker-end="url(#audit-mobile)"></path>
+<rect class="diagram-node " x="20" y="107" width="320" height="60" rx="3"></rect>
+<text class="diagram-title" x="180" y="133" text-anchor="middle">ANCHOR + SIGN RECEIPT</text>
+<text class="diagram-detail" x="180" y="154" text-anchor="middle">commitment fixed before audit</text>
+<path class="diagram-line" d="M180 167V189" marker-end="url(#audit-mobile)"></path>
+<rect class="diagram-node " x="20" y="194" width="320" height="60" rx="3"></rect>
+<text class="diagram-title" x="180" y="220" text-anchor="middle">POST-COMMIT RANDOMNESS</text>
+<text class="diagram-detail" x="180" y="241" text-anchor="middle">select whether and where to audit</text>
+<path class="diagram-line" d="M180 254V276H15V522"></path>
+<path class="diagram-line" d="M15 320H45" marker-end="url(#audit-mobile)"></path><path class="diagram-line" d="M15 522H45" marker-end="url(#audit-mobile)"></path>
+<rect class="diagram-node " x="50" y="290" width="290" height="60" rx="3"></rect>
+<text class="diagram-title" x="195" y="316" text-anchor="middle">NO CHALLENGE</text>
+<text class="diagram-detail" x="195" y="337" text-anchor="middle">wait for challenge window</text>
+<path class="diagram-line" d="M195 350V372" marker-end="url(#audit-mobile)"></path>
+<rect class="diagram-node diagram-node-terminal" x="50" y="377" width="290" height="55" rx="3"></rect>
+<text class="diagram-title" x="195" y="400.5" text-anchor="middle">PAY</text>
+<text class="diagram-detail" x="195" y="421.5" text-anchor="middle">simulated settlement</text>
+<rect class="diagram-node " x="50" y="492" width="290" height="60" rx="3"></rect>
+<text class="diagram-title" x="195" y="518" text-anchor="middle">OPEN + VERIFY</text>
+<text class="diagram-detail" x="195" y="539" text-anchor="middle">check the selected evidence</text>
+<path class="diagram-line" d="M195 552V577H30V765"></path>
+<path class="diagram-line" d="M30 610H65" marker-end="url(#audit-mobile)"></path><path class="diagram-line" d="M30 687H65" marker-end="url(#audit-mobile)"></path><path class="diagram-line" d="M30 764H65" marker-end="url(#audit-mobile)"></path>
+<rect class="diagram-node diagram-node-terminal" x="70" y="583" width="270" height="54" rx="3"></rect>
+<text class="diagram-title" x="205" y="615" text-anchor="middle">VALID → PAY</text>
+<rect class="diagram-node " x="70" y="660" width="270" height="54" rx="3"></rect>
+<text class="diagram-title" x="205" y="692" text-anchor="middle">INVALID → REFUND</text>
+<rect class="diagram-node " x="70" y="737" width="270" height="54" rx="3"></rect>
+<text class="diagram-title" x="205" y="769" text-anchor="middle">UNCLEAR → HOLD</text>
+</svg>
+<figcaption id="verification-diagram-caption">Experimental optimistic path, using the draft’s simulated settlement policy. An invalid provider opening leads to refund; inconclusive evidence or verifier timeout leads to hold, not an accusation of fraud. Missing provider evidence has separate timeout rules. A hold requires the documented recovery or laboratory disposition; real-funds release and slashing are not implemented.</figcaption>
+</figure>
+
+      <h3>Economic security must be measured</h3>
+      <p>Audits would need to make expected gains from cheating smaller than expected losses, while keeping honest service viable. That depends on detection probability, how much work can be sold before detection, verifier incentives, false accusations, collusion, and capital cost—not merely a large stake number.</p>
+      <p>Private prompts and outputs create another constraint: a challenge must reveal enough to verify the claim without silently exposing customer data. The research must also specify an unpredictable, bias-resistant randomness source and credible dispute handling. These are unresolved dependencies.</p>
+      <p>Initial payments and penalties stay simulated. Stable-value settlement is the intended direction; a native asset is not part of the baseline and would need a demonstrated necessity.</p>
+    </section>
+
+    <section class="paper-section" id="roadmap" aria-labelledby="roadmap-title">
+      <p class="section-label">04 / Research and implications</p>
+      <h2 id="roadmap-title">What would justify the next step?</h2>
+      <p>Fluxyard already has a trusted GPU-market transaction path: revisioned offers, immutable accepted terms, usage evidence, and append-only charges. Its control plane and database are trusted. Those patterns are a starting point for OpenInfer, not evidence of permissionless providers, independent verification, or decentralized settlement. The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/PROTOCOL.md#3-current-boundary">draft’s evidence map</a> makes that distinction explicit.</p>
+      <p>The next implementation milestone is a cross-language set of signed-object fixtures and a shadow transaction through Fluxyard. Existing <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/tests/protocol-cases.mjs">runnable examples</a> cover selected cases; they are not a complete conformance suite or a working inference network.</p>
+
+      <h3>Experiments and stop conditions</h3>
+      <p>Each experiment should publish its code revision, model and hardware configuration, control runs, raw measurements, uncertainty, failures, and advance-or-stop decision. The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">E0–E7 research plan</a> contains the procedures.</p>
+      <ol class="experiment-list">
+        <li><strong>Fix the execution profile · E0, E3.</strong> Measure honest divergence across runtimes, kernels, and precision. Stop exact-transition verification if useful cheating cannot be separated from ordinary numerical variation.</li>
+        <li><strong>Measure commitments and replay · E1, E2.</strong> Target less than 3% service overhead and less than 0.1% of original request cost for one challenged transition. Include weight loading, transfer, and cold-verifier costs. These are research targets, not achieved results.</li>
+        <li><strong>Attack and price the design · E4, E5.</strong> Test substitute models, skipped work, altered routes, and fabricated traces paired with different outputs. Publish detection curves and aggregate audit cost. Do not advance if a useful shortcut remains profitable or security needs implausible capital or subsidies.</li>
+        <li><strong>Rehearse failure and independent review · E6, E7.</strong> Exercise restart, duplicate delivery, missing evidence, and verifier timeout without real funds. Require two independent verifiers to agree on the same evidence before progressing toward open challenges.</li>
+      </ol>
+      <p>If the simple sampling design fails, compare replication, trusted execution, or proof systems against the same workload and cost model. A negative result should narrow the protocol’s claims and guide the next experiment.</p>
+
+      <h3 id="services-title">Beyond inference</h3>
+      <p>If one service works, an agent could purchase data, computation, storage, or specialist work through the same transaction envelope. A research agent might buy a dataset, run an analysis, and commission an independent review, settling each contribution separately.</p>
+      <p>What generalizes is agreement and accounting, not a universal verifier. Storage delivery, model execution, and a specialist’s judgment need different acceptance criteria. Each service would require its own profile and evidence before OpenInfer could claim to support it.</p>
+<figure class="protocol-diagram services-diagram" role="img" aria-labelledby="services-diagram-caption">
+        <svg class="diagram-desktop" viewBox="0 0 1120 650" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="services-arrow-desktop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 8 4 0 8Z"></path>
+            </marker>
+          </defs>
+
+          <text class="diagram-detail" x="40" y="38">BUYER</text>
+          <text class="diagram-detail" x="350" y="38">SERVICE BUNDLE ASSEMBLED FOR THIS JOB</text>
+
+          <path class="diagram-line diagram-arrow" d="M270 120H345" marker-end="url(#services-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M560 120H605" marker-end="url(#services-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M820 120H865" marker-end="url(#services-arrow-desktop)"></path>
+          <rect class="diagram-node diagram-node-primary" x="40" y="70" width="230" height="100" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="155" y="110" text-anchor="middle">RESEARCH AGENT</text>
+          <text class="diagram-detail diagram-detail-inverse" x="155" y="139" text-anchor="middle">analyze 8,000 filings</text>
+          <rect class="diagram-node" x="350" y="70" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="455" y="110" text-anchor="middle">SEARCH + DATA</text>
+          <text class="diagram-detail" x="455" y="139" text-anchor="middle">web · financial</text>
+          <rect class="diagram-node" x="610" y="70" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="715" y="110" text-anchor="middle">REASONING</text>
+          <text class="diagram-detail" x="715" y="139" text-anchor="middle">inference</text>
+          <rect class="diagram-node" x="870" y="70" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="975" y="110" text-anchor="middle">SPECIALIST REVIEW</text>
+          <text class="diagram-detail" x="975" y="139" text-anchor="middle">independent agent</text>
+
+          <path class="diagram-line diagram-arrow" d="M270 295H345" marker-end="url(#services-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M560 295H605" marker-end="url(#services-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M820 295H865" marker-end="url(#services-arrow-desktop)"></path>
+          <rect class="diagram-node diagram-node-primary" x="40" y="245" width="230" height="100" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="155" y="285" text-anchor="middle">BUILD AGENT</text>
+          <text class="diagram-detail diagram-detail-inverse" x="155" y="314" text-anchor="middle">ship a software change</text>
+          <rect class="diagram-node" x="350" y="245" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="455" y="285" text-anchor="middle">CODING MODEL</text>
+          <text class="diagram-detail" x="455" y="314" text-anchor="middle">intelligence</text>
+          <rect class="diagram-node" x="610" y="245" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="715" y="285" text-anchor="middle">CODE EXECUTION</text>
+          <text class="diagram-detail" x="715" y="314" text-anchor="middle">tool</text>
+          <rect class="diagram-node" x="870" y="245" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="975" y="285" text-anchor="middle">GPU COMPUTE</text>
+          <text class="diagram-detail" x="975" y="314" text-anchor="middle">compute</text>
+
+          <path class="diagram-line diagram-arrow" d="M270 470H345" marker-end="url(#services-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M560 470H605" marker-end="url(#services-arrow-desktop)"></path>
+          <path class="diagram-line diagram-arrow" d="M820 470H865" marker-end="url(#services-arrow-desktop)"></path>
+          <rect class="diagram-node diagram-node-primary" x="40" y="420" width="230" height="100" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="155" y="460" text-anchor="middle">MEDIA AGENT</text>
+          <text class="diagram-detail diagram-detail-inverse" x="155" y="489" text-anchor="middle">produce a visual asset</text>
+          <rect class="diagram-node" x="350" y="420" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="455" y="460" text-anchor="middle">VISION MODEL</text>
+          <text class="diagram-detail" x="455" y="489" text-anchor="middle">intelligence</text>
+          <rect class="diagram-node" x="610" y="420" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="715" y="460" text-anchor="middle">GPU RENDER</text>
+          <text class="diagram-detail" x="715" y="489" text-anchor="middle">compute</text>
+          <rect class="diagram-node" x="870" y="420" width="210" height="100" rx="3"></rect>
+          <text class="diagram-title" x="975" y="460" text-anchor="middle">STORE + DELIVER</text>
+          <text class="diagram-detail" x="975" y="489" text-anchor="middle">storage · service</text>
+
+          <rect class="diagram-node diagram-node-primary" x="40" y="575" width="1040" height="48" rx="3"></rect>
+          <text class="diagram-title diagram-title-inverse" x="560" y="606" text-anchor="middle">OPENINFER · DISCOVER → AGREE → EXECUTE → CHECK → SETTLE</text>
+        </svg>
+
+<svg class="diagram-mobile" viewBox="0 0 360 750" aria-hidden="true" focusable="false">
+<defs><marker id="services-arrow-mobile" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z"></path></marker></defs>
+<rect class="diagram-node diagram-node-primary" x="20" y="20" width="320" height="50" rx="3"></rect>
+<text class="diagram-title diagram-title-inverse" x="180" y="41" text-anchor="middle">RESEARCH AGENT</text>
+<text class="diagram-detail diagram-detail-inverse" x="180" y="61" text-anchor="middle">analyze 8,000 filings</text>
+<path class="diagram-line" d="M180 70V80" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="84" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="108" text-anchor="middle">SEARCH + DATA</text>
+<path class="diagram-line" d="M180 120V130" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="134" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="158" text-anchor="middle">REASONING</text>
+<path class="diagram-line" d="M180 170V180" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="184" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="208" text-anchor="middle">SPECIALIST REVIEW</text>
+<rect class="diagram-node diagram-node-primary" x="20" y="240" width="320" height="50" rx="3"></rect>
+<text class="diagram-title diagram-title-inverse" x="180" y="261" text-anchor="middle">BUILD AGENT</text>
+<text class="diagram-detail diagram-detail-inverse" x="180" y="281" text-anchor="middle">ship a software change</text>
+<path class="diagram-line" d="M180 290V300" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="304" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="328" text-anchor="middle">CODING MODEL</text>
+<path class="diagram-line" d="M180 340V350" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="354" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="378" text-anchor="middle">CODE EXECUTION</text>
+<path class="diagram-line" d="M180 390V400" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="404" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="428" text-anchor="middle">GPU COMPUTE</text>
+<rect class="diagram-node diagram-node-primary" x="20" y="460" width="320" height="50" rx="3"></rect>
+<text class="diagram-title diagram-title-inverse" x="180" y="481" text-anchor="middle">MEDIA AGENT</text>
+<text class="diagram-detail diagram-detail-inverse" x="180" y="501" text-anchor="middle">produce a visual asset</text>
+<path class="diagram-line" d="M180 510V520" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="524" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="548" text-anchor="middle">VISION MODEL</text>
+<path class="diagram-line" d="M180 560V570" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="574" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="598" text-anchor="middle">GPU RENDER</text>
+<path class="diagram-line" d="M180 610V620" marker-end="url(#services-arrow-mobile)"></path>
+<rect class="diagram-node" x="40" y="624" width="280" height="36" rx="3"></rect>
+<text class="diagram-title" x="180" y="648" text-anchor="middle">STORE + DELIVER</text>
+<rect class="diagram-node diagram-node-primary" x="20" y="695" width="320" height="36" rx="3"></rect>
+<text class="diagram-detail diagram-detail-inverse" x="180" y="718" text-anchor="middle">A SEPARATE PURCHASE FOR EACH SERVICE</text>
+</svg>
+        <figcaption id="services-diagram-caption">Illustrative workflows, not available OpenInfer services. Arrows show a possible work sequence. Each service is a separate purchase with its own provider, budget, and acceptance criteria.</figcaption>
+      </figure>
+
+      <h3>Documents and foundations</h3>
+      <ul class="references">
+        <li><a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/PROTOCOL.md">Protocol Draft 0001</a> — core, inference, signed-receipt, and experimental assurance profiles, with maturity labels.</li>
+        <li><a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">Research plan E0–E7</a> — methods, measurements, controls, and stop conditions.</li>
+        <li><a href="https://www.rfc-editor.org/rfc/rfc8785.html">RFC 8785</a> and <a href="https://www.rfc-editor.org/rfc/rfc8032.html">RFC 8032</a> — the draft’s JSON canonicalization and Ed25519 signature foundations. They support reproducible signed claims, not proof of model execution.</li>
+      </ul>
+      <p class="publication-note">This paper explains the proposal; the versioned draft defines its wire rules. OpenInfer Draft 0001 is a project research draft, not an IETF RFC or an adopted standard. Corrections and counterexamples are welcome through the <a href="https://github.com/Fluxyard-Inc/openinfer">source repository</a>.</p>
+    </section>
+  </main>
+  <footer><a class="mark" href="#top"><span>O/I</span> OpenInfer</a><p>An open protocol for the machine economy.</p><a href="#contents">Back to contents ↑</a></footer>
+</body>
+</html>

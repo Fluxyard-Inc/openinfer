@@ -1,0 +1,196 @@
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("assets/fonts/inter-var.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("assets/fonts/plex-mono-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("assets/fonts/plex-mono-500.woff2") format("woff2");
+}
+:root {
+  color-scheme: light;
+  --ink: #20211e;
+  --muted: #62655f;
+  --paper: #f5f2ec;
+  --wash: #ebe9e3;
+  --accent: #435e58;
+  --line: #d5d3cc;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-synthesis: none;
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.7;
+}
+a { color: var(--accent); text-underline-offset: .2em; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+p { margin: 1rem 0; }
+h1, h2, h3 { line-height: 1.3; font-weight: 550; text-wrap: balance; }
+h1 { margin: .6rem 0; font-size: 2.5rem; letter-spacing: -.045em; }
+h2 { margin: .6rem 0 1.3rem; font-size: 1.65rem; letter-spacing: -.025em; }
+h3 { margin: 2rem 0 .65rem; font-size: 1.15rem; letter-spacing: -.015em; }
+strong { font-weight: 600; }
+.skip-link {
+  position: fixed;
+  top: .6rem;
+  left: 1rem;
+  z-index: 20;
+  padding: .6rem 1rem;
+  background: var(--ink);
+  color: var(--paper);
+  transform: translateY(-180%);
+}
+.skip-link:focus { transform: none; }
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .65rem max(1.25rem, calc((100% - 960px) / 2));
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+.mark {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: .65rem;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -.025em;
+}
+.mark span {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 3px;
+  font: 400 .75rem/1 var(--mono);
+}
+.site-header nav { display: flex; align-items: center; gap: 1.5rem; }
+.site-header nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: .875rem; }
+main { width: min(740px, calc(100% - 2.5rem)); margin-inline: auto; }
+.paper-header { padding: 3rem 0 1.5rem; }
+.metadata, .section-label { color: var(--muted); font: 400 .75rem/1.7 var(--mono); }
+.metadata { margin-top: 0; }
+.subtitle { margin: 0 0 1.5rem; font-size: 1.15rem; }
+.status-note { border-left: 2px solid var(--line); padding-left: 1rem; font-size: .9rem; color: var(--muted); }
+.contents { padding: 1.25rem 0; border-block: 1px solid var(--line); }
+.contents .section-label { margin: 0 0 .45rem; }
+.contents ol { display: grid; grid-template-columns: 1fr 1fr; gap: .1rem 1.5rem; list-style: none; margin: 0; padding: 0; }
+.contents a { display: flex; align-items: baseline; gap: .8rem; padding-block: .45rem; font-size: .95rem; text-decoration: none; }
+.contents a:hover { text-decoration: underline; }
+.contents span { color: var(--muted); font: .75rem/1.7 var(--mono); }
+.paper-section { padding: 2.5rem 0; border-bottom: 1px solid var(--line); }
+.paper-section > .section-label { margin-top: 0; }
+.paper-section > :last-child { margin-bottom: 0; }
+.transaction-steps { margin: 1.5rem 0; padding-left: 1.5rem; }
+.transaction-steps li { padding-left: .4rem; margin-block: 1.25rem; }
+.transaction-steps li::marker { color: var(--muted); font: .85rem var(--mono); }
+.transaction-steps h3 { margin: 0 0 .35rem; font-size: 1rem; font-weight: 600; }
+.transaction-steps p { margin: 0; }
+.protocol-diagram {
+  width: calc(100% + 6rem);
+  margin: 1.75rem -3rem;
+  border: 1px solid var(--line);
+  background: #f8f6f1;
+}
+.protocol-diagram svg { display: block; width: 100%; height: auto; }
+.protocol-diagram .diagram-mobile { display: none; }
+.diagram-node { fill: var(--paper); stroke: #a9ada6; stroke-width: 1; }
+.diagram-node-primary { fill: var(--ink); stroke: var(--ink); }
+.diagram-node-terminal { fill: #e4ebe7; }
+.diagram-line { fill: none; stroke: #66736d; stroke-width: 1.3; }
+.protocol-diagram marker path { fill: #66736d; }
+.diagram-title { fill: var(--ink); font: 500 17px var(--mono); }
+.diagram-detail { fill: #50584f; font: 400 13px var(--mono); }
+.diagram-title-inverse, .diagram-detail-inverse { fill: var(--paper); }
+.services-diagram .diagram-desktop .diagram-title { font-size: 19px; }
+.services-diagram .diagram-desktop .diagram-detail { font-size: 16px; }
+.protocol-diagram figcaption { margin: 0; padding: .85rem 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; line-height: 1.6; }
+.assurance-table { width: 100%; margin: 1.75rem 0; border-collapse: collapse; table-layout: fixed; font-size: .875rem; line-height: 1.55; }
+.assurance-table caption { margin-bottom: .85rem; color: var(--muted); text-align: left; }
+.assurance-table th, .assurance-table td { padding: .85rem .65rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.assurance-table thead { background: var(--wash); }
+.assurance-table th { font-weight: 550; }
+.assurance-table th:first-child { width: 26%; }
+.experiment-list { padding-left: 1.4rem; }
+.experiment-list li { margin-block: 1rem; padding-left: .3rem; }
+.references { padding-left: 1.25rem; font-size: .9rem; }
+.references li { margin-block: .65rem; }
+.publication-note { font-size: .85rem; color: var(--muted); }
+footer { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.5rem; width: min(960px, calc(100% - 2.5rem)); margin: 0 auto; padding: 1.5rem 0; font-size: .8rem; color: var(--muted); }
+footer p { flex: 1; margin: 0; }
+footer > a:last-child { padding-block: .65rem; }
+@media (max-width: 900px) {
+  .protocol-diagram { width: 100%; margin-inline: 0; }
+  .services-diagram .diagram-desktop { display: none; }
+  .services-diagram .diagram-mobile { display: block; max-width: 380px; margin-inline: auto; }
+}
+@media (max-width: 600px) {
+  :root { scroll-padding-top: 5.5rem; }
+  .site-header nav { gap: 1rem; }
+  .site-header nav a { font-size: .8125rem; }
+  .paper-header { padding-top: 2rem; }
+  h1 { font-size: 2.1rem; }
+  h2 { font-size: 1.5rem; }
+  .contents ol { grid-template-columns: 1fr; }
+  .contents a { min-height: 44px; }
+  .paper-section { padding-block: 2rem; }
+  .protocol-diagram .diagram-desktop { display: none; }
+  .protocol-diagram .diagram-mobile { display: block; max-width: 380px; margin-inline: auto; }
+  .assurance-table, .assurance-table tbody { display: block; }
+  .assurance-table { font-size: .9rem; }
+  .assurance-table caption { display: block; }
+  .assurance-table thead { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+  .assurance-table tbody tr { display: block; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+  .assurance-table th, .assurance-table td { display: block; padding: .3rem 0; border: 0; overflow-wrap: normal; }
+  .assurance-table th:first-child { width: auto; font-size: 1rem; }
+  .assurance-table td::before { content: attr(data-label) ": "; font-weight: 550; }
+  footer { align-items: flex-start; }
+  footer p { flex-basis: 100%; order: 3; }
+}
+@media (max-width: 370px) {
+  .site-header { gap: .5rem; padding-inline: 1rem; }
+  .site-header .mark { font-size: .9rem; gap: .4rem; }
+  .site-header nav { gap: .6rem; }
+  .site-header nav a { font-size: .75rem; }
+  main { width: calc(100% - 2rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { scroll-behavior: auto; }
+}
+@media print {
+  .site-header, .skip-link, .contents, footer { display: none; }
+  body { color: #000; background: #fff; font-size: 11pt; }
+  main { width: 100%; }
+  .paper-header { padding-top: 0; }
+  .protocol-diagram { width: 100%; margin-inline: 0; break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+}
