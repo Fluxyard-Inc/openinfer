@@ -1047,7 +1047,7 @@ footer p:last-child { justify-self: end; }
 
   .contents { grid-template-columns: 1fr; gap: 3rem; }
   .contents-intro { position: static; }
-  .contents h2 { max-width: 12ch; }
+  
   .contents-list a {
     min-height: auto;
     grid-template-columns: 2rem 1fr;
