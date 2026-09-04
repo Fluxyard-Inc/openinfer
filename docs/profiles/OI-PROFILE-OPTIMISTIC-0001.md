@@ -2,10 +2,10 @@
 
 | Field | Value |
 | --- | --- |
-| Profile identifier | **oi.optimistic/0.1** |
+| Profile identifier | **oi.optimistic/0.2** |
 | Status | **Experimental** |
-| Core dependency | **oi-core/0.1** |
-| Initial service dependency | **oi.inference/0.1** |
+| Core dependency | **oi-core/0.2** |
+| Initial service dependency | **oi.inference/0.2** |
 | Last updated | **2026-09-04** |
 
 ## 1. Scope
@@ -73,7 +73,7 @@ The initial MoE checkpoint profile is:
 }
 ```
 
-`index` values are contiguous `UIntString` values beginning at `0`. Checkpoints cover the Cartesian product of generated output-token indices `0, stride, 2*stride, ... < output_tokens` and model-layer indices `0, stride, 2*stride, ... < layer_count`, ordered first by token and then by layer. The execution profile defines tensor shape, element representation, quantization, digest layout, routing rules, accepted numeric tolerance, and the contents of replay context. A checkpoint lacking those definitions is unverifiable and MUST be rejected.
+`index` values are contiguous `UIntString` values beginning at `0`. Checkpoints cover the Cartesian product of generated output-token indices `0, stride, 2*stride, ... < output_tokens` and model-layer indices `0, stride, 2*stride, ... < layer_count`, ordered first by token and then by layer. The execution profile defines tensor shape, element representation, quantization, digest layout, routing rules, accepted numeric tolerance, and the contents of replay context. A checkpoint lacking those definitions is unverifiable and MUST be rejected. The versioned checkpoint/verifier specification MUST additionally define how the committed request and output token sequence determine each sampled token's prefix/replay context and how the sampled computation is connected to that token's output distribution and sampling decision. A mere locally consistent transition on provider-chosen activations is insufficient. These definitions remain an E0/E2 research deliverable; a deployment MUST reject an unsupported specification rather than report a valid verdict.
 
 ## 5. Merkle commitment
 
@@ -110,6 +110,10 @@ expected_leaf_count = ceil(output_tokens / checkpoint_stride_tokens)
 The Receipt is `profile_mismatch` unless `leaf_count == expected_leaf_count`. The root proves only that the provider did not change this required checkpoint set after signing.
 
 ## 6. Commitment anchoring and randomness
+
+The provider MUST finish the output and usage, sign their digests in the core ExecutionCommitment, and only then anchor it. A Receipt MUST reproduce those digests. An Opening MUST disclose the committed output object and usage (or authorized encrypted references) as required by the checkpoint specification so the verifier can check their digests and their connection to replay context. No output may be selected or substituted after randomness is revealed.
+
+The decoded `replay_input` plaintext is a closed object with `output` (the inference output object), `usage` (the Receipt usage object), and `context` (the object defined by the named checkpoint specification). Its full JCS bytes determine `byte_length`, `digest`, and the checkpoint's `replay_context_digest`. Inline `value` carries this object; an encrypted reference resolves to the same canonical bytes. Implementations may deduplicate identical output bytes in storage, but MUST verify the full committed plaintext.
 
 Before the selected randomness round becomes knowable, the provider MUST submit the signed execution-commitment digest to the agreed anchor profile. `Receipt.assurance_evidence` includes the resulting anchor:
 
@@ -158,7 +162,7 @@ A `Challenge` payload is:
 {
   "receipt_digest": "sha256:<digest>",
   "commitment_digest": "sha256:<digest>",
-  "assurance_profile": "oi.optimistic/0.1",
+  "assurance_profile": "oi.optimistic/0.2",
   "anchor_evidence_digest": "sha256:<digest>",
   "randomness_source": "oi.randomness.external/0.1",
   "randomness_round": "12345",
@@ -179,7 +183,7 @@ An `Opening` payload is:
 {
   "receipt_digest": "sha256:<digest>",
   "challenge_digest": "sha256:<digest>",
-  "assurance_profile": "oi.optimistic/0.1",
+  "assurance_profile": "oi.optimistic/0.2",
   "openings": [
     {
       "index": "1842",
@@ -199,7 +203,22 @@ An `Opening` payload is:
 }
 ```
 
-The Opening envelope issuer MUST equal the Agreement provider. Every requested index appears exactly once, in numeric order, and `opening.index == checkpoint.index ==` the recomputed challenged index. Merkle direction is derived from that index and `leaf_count`. The Opening envelope `issued_at` MUST be no later than `opening_deadline`. Inline replay input uses non-null `value` and null reference fields; encrypted replay input uses null `value` and non-null `uri`, `encryption_profile`, and `recipient_key_id`. A missing opening produces no Verdict; the authorized finalizer handles `opening_timeout` under the signed settlement policy.
+The Opening envelope issuer MUST equal the Agreement provider. Every requested index appears exactly once, in numeric order, and `opening.index == checkpoint.index ==` the recomputed challenged index. Merkle direction is derived from that index and `leaf_count`. Inline replay input uses non-null `value` and null reference fields; encrypted replay input uses null `value` and non-null `uri`, `encryption_profile`, and `recipient_key_id`.
+
+An Opening alone MUST NOT transition the transaction out of `disputed`. The named finalizer records complete delivery using its own clock and signs an `OpeningAcceptance` with this closed payload:
+
+```json
+{
+  "receipt_digest": "sha256:<digest>",
+  "challenge_digest": "sha256:<digest>",
+  "opening_digest": "sha256:<digest>",
+  "assurance_profile": "oi.optimistic/0.2"
+}
+```
+
+Its envelope issuer MUST equal `settlement_policy.finalizer`, and its `issued_at` MUST record that observed delivery time, not a timestamp supplied by the provider. A receiver checks `Challenge.issued_at <= Opening.issued_at <= OpeningAcceptance.issued_at <= opening_deadline` and that all references identify the accepted Challenge, Receipt, and Opening. The finalizer MUST NOT sign an on-time acknowledgement for late delivery. Only the Opening and matching valid acknowledgement, persisted together, transition to `opened`. Expensive numeric verification follows that transition; a structurally valid but incorrect opening can receive an invalid Verdict.
+
+A missing or late opening creates no accepted acknowledgement or Verdict and leaves state `disputed`; late delivery returns `deadline_exceeded`. The finalizer handles `opening_timeout` strictly after the inclusive opening deadline. The single reference finalizer's clock and honest observation remain explicit laboratory trust assumptions.
 
 ## 9. Verification algorithm
 
@@ -209,7 +228,7 @@ For each opening, a verifier MUST:
 2. recompute the challenge indices;
 3. hash the JCS checkpoint and verify its Merkle path to the committed root;
 4. confirm checkpoint fields match the accepted execution and checkpoint profiles;
-5. verify that replay input matches its digest and the checkpoint's replay-context digest;
+5. verify that replay input matches its digest and the checkpoint's replay-context digest, that the disclosed output and usage match the anchored ExecutionCommitment, and that the checkpoint specification's request-prefix/output-sampling linkage checks pass;
 6. recompute the selected router, expert, and output transition under the verifier profile;
 7. compare the result using the accepted numeric rule; and
 8. emit one closed reason code.
@@ -218,11 +237,11 @@ The verifier MUST process all selected indices even after finding one invalid op
 
 ## 10. Verdicts
 
-The Verdict envelope issuer and payload `verifier` MUST equal the verifier identity accepted in the agreement. Its `opening_digest` MUST identify the accepted Opening. `verdict_deadline` equals `opening_deadline + verdict_window_seconds`; the ordinary `opened` to `verdict_available` transition requires Verdict `issued_at <= verdict_deadline`, with only the held-state exception defined in section 11. A Verdict includes the verifier's signed opening observation and one result for each selected index:
+The Verdict envelope issuer and payload `verifier` MUST equal the verifier identity accepted in the agreement. Its `opening_digest` MUST identify the accepted Opening. `verdict_deadline` equals `opening_deadline + verdict_window_seconds`; the ordinary `opened` to `verdict_available` transition requires Verdict `issued_at <= verdict_deadline`, with only the held-state exception defined in section 11. A Verdict references the already accepted signed opening observation and includes one result for each selected index:
 
 ```json
 {
-  "opening_observed_at": "2026-09-04T00:04:00Z",
+  "opening_acceptance_digest": "sha256:<digest>",
   "index_results": [
     {
       "index": "1842",
@@ -234,7 +253,7 @@ The Verdict envelope issuer and payload `verifier` MUST equal the verifier ident
 }
 ```
 
-`opening_observed_at` MUST be no later than `opening_deadline`. Results appear exactly once in numeric index order. The per-index reason codes are:
+`opening_acceptance_digest` MUST identify the OpeningAcceptance accepted with this Opening. A Verdict cannot supply a new observation time or repair a missing/late acknowledgement. Results appear exactly once in numeric index order. The per-index reason codes are:
 
 ```text
 valid_opening
@@ -267,15 +286,32 @@ Laboratory and shadow deployments MUST use simulated settlement. The profile's c
 | Finalization reason | Required state and evidence | Earliest time | Outcome |
 | --- | --- | --- | --- |
 | `no_challenge` | `verification_pending`; ReceiptAcceptance digest | challenge deadline | `valid` |
-| `opening_timeout` | `disputed`; Challenge digest | opening deadline | `invalid` |
-| `verifier_timeout` | `opened`; Opening digest | verdict deadline | `indeterminate` |
+| `opening_timeout` | `disputed`; Challenge digest | strictly after opening deadline | `invalid` |
+| `verifier_timeout` | `opened`; OpeningAcceptance digest | verdict deadline | `indeterminate` |
 | `valid_verdict` | `verdict_available`; valid Verdict digest | Verdict issuance | `valid` |
 | `invalid_verdict` | `verdict_available`; invalid Verdict digest | Verdict issuance | `invalid` |
 | `indeterminate_verdict` | `verdict_available`; indeterminate Verdict digest | Verdict issuance | `indeterminate` |
 
-The signed settlement-policy `reason_map` MUST contain exactly these six keys plus any required service-profile keys. Invalid Challenges and verifier failures MUST NOT become provider-invalid outcomes. `indeterminate_verdict` and `verifier_timeout` MUST map to `hold` in the baseline mock policy. Only a `verifier_timeout` hold may accept the first late Verdict, transition back to `verdict_available`, and receive a superseding Finalization; an `indeterminate_verdict` hold has no supersession in this profile version.
+The signed settlement-policy `reason_map` MUST contain the union of the core, service, and assurance registries. With `oi.inference/0.2`, the mock policy contains exactly these eight entries:
+
+```json
+{
+  "commitment_timeout": "refund",
+  "receipt_timeout": "refund",
+  "no_challenge": "pay",
+  "opening_timeout": "refund",
+  "verifier_timeout": "hold",
+  "valid_verdict": "pay",
+  "invalid_verdict": "refund",
+  "indeterminate_verdict": "hold"
+}
+```
+
+Missing keys, extra keys, or different actions are `profile_mismatch` for this mock policy. Invalid Challenges and verifier failures MUST NOT become provider-invalid outcomes. `indeterminate_verdict` and `verifier_timeout` MUST map to `hold` in the baseline mock policy. Only a `verifier_timeout` hold may accept the first late Verdict, transition back to `verdict_available`, and receive a superseding Finalization; an `indeterminate_verdict` hold has no supersession in this profile version.
 
 The profile does not define a token, stake asset, penalty size, challenger reward, or chain. Those parameters require measured audit cost and adversarial results.
+
+The reproducible methods, controls, and stop conditions are in [Research plan E0–E7](../RESEARCH.md).
 
 ## 12. Experiment measurements
 
@@ -302,7 +338,7 @@ The experiment suite includes at least:
 4. fewer experts or altered MoE routing;
 5. a smaller substitute model;
 6. fabricated but internally consistent checkpoints;
-7. changed data after commitment;
+7. changed output or usage after commitment, including different output with the same token count;
 8. challenge grinding or withheld randomness; and
 9. selective cheating based on request value or apparent audit likelihood.
 

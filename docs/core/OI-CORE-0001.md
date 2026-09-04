@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Status | **Implementable Baseline** |
-| Version | **0.1.0-dev** |
+| Version | **0.2.0-dev** |
 | Depends on | RFC 3339, RFC 4648, RFC 8032, RFC 8174, RFC 8785 |
 | Last updated | **2026-09-04** |
 
@@ -17,7 +17,7 @@ This baseline is concrete enough for prototype implementations. It is not produc
 
 The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHOULD**, **SHOULD NOT**, and **MAY** are interpreted as described by [BCP 14](https://www.rfc-editor.org/info/bcp14) when they appear in uppercase.
 
-An implementation conforms to `oi-core/0.1` when it:
+An implementation conforms to `oi-core/0.2` when it:
 
 1. accepts and produces the signed envelope defined here;
 2. applies validation in the defined order;
@@ -58,7 +58,7 @@ JSON numbers MUST NOT appear in signed payloads. Decimal prices, quantities, and
 
 `PositiveUIntString` is a JSON string matching `[1-9][0-9]*`.
 
-`Timestamp` is `YYYY-MM-DDTHH:MM:SSZ`. Fractional seconds and non-UTC offsets are invalid in `oi-core/0.1`.
+`Timestamp` is `YYYY-MM-DDTHH:MM:SSZ`. Fractional seconds and non-UTC offsets are invalid in `oi-core/0.2`.
 
 `NetworkId` matches `[a-z0-9][a-z0-9.-]{0,63}`.
 
@@ -99,9 +99,9 @@ An `IdentityDocument` payload contains exactly one signing key:
 }
 ```
 
-The identity document is self-signed. A verifier MUST confirm that the identity equals the digest-derived identifier of the signing key. Key rotation and revocation require a later identity profile or an external resolver; `oi-core/0.1` does not infer historical validity from issuer-controlled timestamps.
+The identity document is self-signed. A verifier MUST confirm that the identity equals the digest-derived identifier of the signing key. Key rotation and revocation require a later identity profile or an external resolver; `oi-core/0.2` does not infer historical validity from issuer-controlled timestamps.
 
-Multi-signature, threshold, and hardware-attested identities are outside `oi-core/0.1`.
+Multi-signature, threshold, and hardware-attested identities are outside `oi-core/0.2`.
 
 ## 6. Signed envelope
 
@@ -110,7 +110,7 @@ Every attributable object uses this envelope:
 ```json
 {
   "network_id": "openinfer-testnet-1",
-  "protocol": "oi-core/0.1",
+  "protocol": "oi-core/0.2",
   "suite": "oi-suite-jcs-ed25519-sha256/0.1",
   "kind": "offer",
   "issuer": "oi:<digest>",
@@ -138,6 +138,7 @@ receipt
 receipt_acceptance
 challenge
 opening
+opening_acceptance
 verdict
 finalization
 settlement_instruction
@@ -153,7 +154,7 @@ payload_bytes  = JCS(payload)
 payload_digest = "sha256:" + BASE64URL(SHA-256(payload_bytes))
 
 unsigned_envelope = envelope with the signature field removed
-signature_input   = UTF8("openinfer-signed-envelope-v0.1\n")
+signature_input   = UTF8("openinfer-signed-envelope-v0.2\n")
                     || JCS(unsigned_envelope)
 signature         = Ed25519-Sign(private_key, signature_input)
 envelope_digest   = "sha256:" + BASE64URL(SHA-256(signature_input))
@@ -217,19 +218,17 @@ The identity tuple `(provider, offer_id, revision)` MUST map to one envelope dig
 | `nonce` | string | At least 128 bits of random data, base64url |
 | `expires_at` | `Timestamp` | Request acceptance deadline |
 
-`expires_at` MUST equal the Request envelope `expires_at`. `settlement_policy` MUST contain `profile`, `finalizer`, `instruction_issuer`, `adapter`, `adapter_identity`, and a closed `reason_map`. The map is keyed only by finalization reason codes and MUST contain exactly one settlement action for every code permitted by the service and assurance profiles named by the agreement. The baseline mock policy shape is:
+`expires_at` MUST equal the Request envelope `expires_at`. `settlement_policy` MUST contain `profile`, `finalizer`, `instruction_issuer`, `adapter`, `adapter_identity`, and a closed `reason_map`. The map is keyed only by finalization reason codes and MUST contain exactly the union of the core, active service, and active assurance Finalization registries, with one action per code and no extra keys. The core contributes `commitment_timeout` and `receipt_timeout` to every policy. The baseline mock policy for `oi.signed-receipt/0.1` is:
 
 ```json
 {
-  "profile": "oi.settlement-policy.mock/0.1",
+  "profile": "oi.settlement-policy.mock/0.2",
   "finalizer": "oi:<digest>",
   "instruction_issuer": "oi:<digest>",
   "adapter": "oi.settlement.mock/0.1",
   "adapter_identity": "oi:<digest>",
   "reason_map": {
-    "valid_verdict": "pay",
-    "invalid_verdict": "refund",
-    "indeterminate_verdict": "hold",
+    "receipt_accepted": "pay",
     "commitment_timeout": "refund",
     "receipt_timeout": "refund"
   }
@@ -256,6 +255,10 @@ The identity tuple `(provider, offer_id, revision)` MUST map to one envelope dig
 
 The signed request represents the buyer's intent. The provider-signed agreement represents acceptance. The Agreement envelope `issued_at` MUST be no later than Request `expires_at`. `commit_deadline` MUST be at least Agreement `issued_at + minimum_commit_window_seconds`; `receipt_deadline` MUST be at least `commit_deadline + minimum_receipt_window_seconds`; and `verification_deadline` MUST satisfy every additional minimum window defined by the assurance profile. An agreement MUST NOT alter service request, assurance parameters, or settlement policy; it binds them by digest.
 
+The transaction identity is `(network_id, buyer, request_id)`. It MUST bind one signed Request digest and at most one accepted Agreement digest, including after timeout or settlement. The tuple `(network_id, provider, agreement_id)` MUST also bind one Agreement digest. Re-signing an agreement with a new sequence does not authorize another purchase: a receiver MUST return the stored result for the exact accepted agreement and return `replay_conflict` for a different Request or Agreement under either identity. A replacement purchase requires a fresh buyer-signed Request with a new `request_id`.
+
+Agreement acceptance MUST atomically check those bindings, validate the service-profile funding requirement, and establish the transaction and its reservation. The baseline finalizer maintains this authoritative acceptance ledger; instruction issuers and adapters MUST use that same accepted history before authorizing an effect. Independent gateways MUST NOT create additional payable histories. This is a trusted-finalizer boundary, not a distributed consensus mechanism. Request/Agreement uniqueness and financial tombstones MUST outlive envelope expiry and MUST NOT be discarded while a historical purchase could be replayed.
+
 ### 7.5 `ExecutionCommitment`
 
 | Field | Type |
@@ -266,10 +269,12 @@ The signed request represents the buyer's intent. The provider-signed agreement 
 | `assurance_profile` | `ProfileId` |
 | `execution_profile_digest` | digest |
 | `input_digest` | digest |
+| `output_digest` | digest |
+| `usage_digest` | digest of JCS service-profile usage |
 | `commitment_profile` | `ProfileId` or `null` |
 | `commitment` | profile-defined object or `null` |
 
-`provider`, `service_profile`, `assurance_profile`, and the envelope issuer MUST equal their Agreement values. If the Agreement's assurance profile requires a commitment, `commitment_profile` MUST equal the accepted profile and `commitment` MUST NOT be `null`. The provider MUST issue this object before any assurance-profile randomness becomes knowable. A mismatch is `profile_mismatch`.
+`provider`, `service_profile`, `assurance_profile`, and the envelope issuer MUST equal their Agreement values. If the Agreement's assurance profile requires a commitment, `commitment_profile` MUST equal the accepted profile and `commitment` MUST NOT be `null`. This object commits to the completed service result, not merely an intention to begin work. Its envelope MUST satisfy `Agreement.issued_at <= issued_at <= Agreement.commit_deadline`, and it MUST be signed and anchored as required before any assurance-profile randomness becomes knowable. A mismatch is `profile_mismatch`.
 
 ### 7.6 `Receipt`
 
@@ -289,7 +294,7 @@ The signed request represents the buyer's intent. The provider-signed agreement 
 | `started_at` | `Timestamp` |
 | `completed_at` | `Timestamp` |
 
-`provider`, `service_profile`, `assurance_profile`, and the envelope issuer MUST equal their Agreement values. `commitment_digest` MUST identify the accepted commitment for that agreement. A mismatch is `profile_mismatch`.
+`provider`, `service_profile`, `assurance_profile`, and the envelope issuer MUST equal their Agreement values. `commitment_digest` MUST identify the accepted commitment for that agreement. `output_digest` and the digest of JCS `usage` MUST equal that commitment's `output_digest` and `usage_digest`; changing either result requires a new purchase, not a replacement Receipt. A mismatch is `profile_mismatch`.
 
 ### 7.7 `ReceiptAcceptance`
 
@@ -306,7 +311,7 @@ The envelope issuer MUST equal `settlement_policy.finalizer`. Its envelope `issu
 
 ### 7.8 Assurance objects
 
-`Challenge`, `Opening`, and `Verdict` MUST reference the receipt digest and named assurance profile. Their profile-specific fields are opaque to the core, but their envelopes, signatures, replay rules, and state transitions remain core-governed.
+`Challenge`, `Opening`, `OpeningAcceptance`, and `Verdict` MUST reference the receipt digest and named assurance profile. Their profile-specific fields are opaque to the core, but their envelopes, signatures, replay rules, and state transitions remain core-governed.
 
 A verdict contains the common fields:
 
@@ -315,10 +320,10 @@ A verdict contains the common fields:
   "receipt_digest": "sha256:<digest>",
   "challenge_digest": "sha256:<digest>",
   "opening_digest": "sha256:<digest>",
-  "assurance_profile": "oi.optimistic/0.1",
+  "assurance_profile": "oi.optimistic/0.2",
   "verifier": "oi:<digest>",
   "outcome": "valid",
-  "reason_code": "all_checks_valid",
+  "reason_code": "all_openings_valid",
   "evidence_digest": "sha256:<digest>"
 }
 ```
@@ -366,7 +371,7 @@ A `SettlementInstruction` is emitted only from a final outcome:
 }
 ```
 
-`outcome` is `pay`, `refund`, or `split`. `accepted_amount` is the amount reserved for the agreement, and `provider_amount + buyer_amount` MUST equal it. `refund` requires provider amount zero and buyer amount equal to the accepted amount. `pay` uses the service-profile charge and returns any remainder to the buyer. `split` amounts are fixed by the settlement-policy profile. Penalties require a later bond profile and are not part of `oi-core/0.1`. The envelope issuer MUST equal `settlement_policy.instruction_issuer`; `adapter`, outcome, and amounts MUST follow the signed reason map and referenced Finalization. A `hold` action creates state `held` and no SettlementInstruction.
+`outcome` is `pay`, `refund`, or `split`. `accepted_amount` is the amount reserved for the agreement, and `provider_amount + buyer_amount` MUST equal it. `refund` requires provider amount zero and buyer amount equal to the accepted amount. `pay` uses the service-profile charge and returns any remainder to the buyer. `split` amounts are fixed by the settlement-policy profile. Penalties require a later bond profile and are not part of `oi-core/0.2`. The envelope issuer MUST equal `settlement_policy.instruction_issuer`; `asset` MUST equal `Agreement.settlement_asset` exactly, including unit scale; `adapter`, outcome, and amounts MUST follow the signed reason map and referenced Finalization. A `hold` action creates state `held` and no SettlementInstruction.
 
 `idempotency_key` MUST equal `settlement:<finalization_digest>:<instruction_revision>`. Instruction revision `0` uses null `supersedes_instruction_digest`. After a rejected SettlementReceipt, one corrected instruction MAY increment the revision, reference the rejected instruction, preserve the finalization, outcome, asset, amounts, and adapter, and use the corresponding new idempotency key. An adapter performing multiple transfers derives stable sub-operation keys from the instruction idempotency key.
 
@@ -395,7 +400,7 @@ The authoritative transaction state is derived from accepted signed objects, not
 | `agreed` | valid `ExecutionCommitment` | `committed` |
 | `committed` | valid `Receipt` plus its valid `ReceiptAcceptance` | `verification_pending` |
 | `verification_pending` | valid `Challenge` | `disputed` |
-| `disputed` | valid `Opening` | `opened` |
+| `disputed` | valid `Opening` plus its valid `OpeningAcceptance` | `opened` |
 | `opened` | valid `Verdict` | `verdict_available` |
 | `agreed`, `committed`, `verification_pending`, `disputed`, `opened`, or `verdict_available` | valid `Finalization` | `finalized_valid`, `finalized_invalid`, `finalized_indeterminate`, or `held` |
 | `finalized_valid`, `finalized_invalid`, or `finalized_indeterminate` | valid `SettlementInstruction` | `settlement_pending` |
@@ -418,12 +423,12 @@ A receiver MUST validate an envelope in this order and stop at the first failure
 4. Validate the payload schema for the named kind and profiles.
 5. Recompute and compare `payload_digest` using JCS.
 6. Resolve the raw public key named by `key_id`, require `key_id == issuer + "#0"`, recompute the identity digest from that key, compare it to `issuer`, and perform strict Ed25519 verification.
-7. Check envelope expiry and deadlines that do not depend on referenced objects.
-8. Apply replay checks.
-9. Resolve referenced objects and compare their digests and identities.
+7. Apply replay checks to authenticated objects: return the stored result for an exact accepted replay, or `replay_conflict` for changed content under a stored replay key. Neither path executes another transition or external effect.
+8. For first submissions only, check envelope expiry and deadlines that do not depend on referenced objects.
+9. Resolve referenced objects and compare their digests and identities. Already accepted historical references retain their validity for the accepted transaction after expiry; expiry limits new admission, not the use of immutable evidence in an existing purchase.
 10. Verify profile semantics, cross-object deadlines, and that the issuer is authorized for the object role.
 11. Validate the transaction state transition.
-12. Persist the object and resulting state atomically.
+12. Persist the object, replay result, request/Agreement uniqueness bindings, reservation, and resulting state atomically. Recheck uniqueness under the transaction lock; concurrent conflicting agreements cannot both succeed.
 
 A receiver MUST NOT partially accept an envelope.
 
@@ -431,9 +436,9 @@ A receiver MUST NOT partially accept an envelope.
 
 The replay key is `(network_id, issuer, kind, sequence)`.
 
-- A replay whose envelope digest matches the stored digest returns the original result without another state or settlement effect.
+- A replay whose envelope digest matches the stored digest returns the original acceptance result even after expiry, without another state or settlement effect. An unknown settlement effect continues reconciliation under its existing key; returning a replay result does not create a new attempt identity.
 - A replay with different content returns `replay_conflict`.
-- A receiver MAY accept out-of-order sequences but MUST retain enough history to detect conflicts until the object's expiry plus the network retention window.
+- A receiver MAY accept out-of-order sequences but MUST retain enough history to detect conflicts until at least the object's expiry plus the network retention window, and through the whole transaction and settlement-reconciliation lifetime if longer. The durable purchase bindings in §7.4 are retained independently.
 - Expiry is not permission to repeat an external settlement effect.
 - A settlement adapter MUST retain idempotency records according to its profile, independent of envelope retention.
 
@@ -450,7 +455,7 @@ Errors use this shape:
 }
 ```
 
-The closed v0.1 codes are:
+The closed v0.2 codes are:
 
 ```text
 invalid_json
@@ -499,9 +504,10 @@ Before this baseline becomes a candidate, the repository must contain:
 1. canonical JSON fixtures including Unicode and numeric edge cases;
 2. valid and invalid identity, envelope, strict Ed25519, and digest vectors;
 3. exact-replay and changed-replay fixtures;
-4. every valid and invalid state transition, including Receipt acceptance, deadline finalization, hold supersession, and rejected-settlement replacement;
+4. every valid and invalid state transition, including Receipt and Opening acceptance, deadline finalization, hold supersession, and rejected-settlement replacement;
 5. every error code with fixed retryability;
 6. absent-versus-null rejection, settlement conservation, and unknown-result retry tests; and
-7. two implementations that produce identical signed bytes and results.
+7. concurrent conflicting agreements, quote-asset mismatch, underfunded acceptance, output substitution, and late-opening cases; and
+8. two implementations that produce identical signed bytes and results.
 
 Those fixtures are the next implementation artifact. Until they exist, `Implementable Baseline` means the specification is concrete, not proven interoperable.

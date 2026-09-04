@@ -5,7 +5,7 @@
 | Document | **OI-DRAFT-0001** |
 | Title | **Protocol family index** |
 | Status | **Research Draft** |
-| Version | **0.2-dev** |
+| Version | **0.3-dev** |
 | Audience | **Implementers, providers, verifier authors, and reviewers** |
 | Last updated | **2026-09-04** |
 
@@ -17,6 +17,7 @@ OpenInfer specifies economic transactions between software buyers and machine-se
 | --- | --- | --- |
 | [OI-CORE-0001](core/OI-CORE-0001.md) | Implementable baseline | Signed objects, canonical encoding, transaction state, replay handling, errors, and settlement outcomes |
 | [OI-PROFILE-INFERENCE-0001](profiles/OI-PROFILE-INFERENCE-0001.md) | Implementable baseline | Open-model inference offers, requests, execution profiles, usage claims, and receipts |
+| [OI-PROFILE-SIGNED-RECEIPT-0001](profiles/OI-PROFILE-SIGNED-RECEIPT-0001.md) | Implementable baseline | Buyer-checked delivery, ordinary signed receipts, and simulated settlement |
 | [OI-PROFILE-OPTIMISTIC-0001](profiles/OI-PROFILE-OPTIMISTIC-0001.md) | Experimental | Trace commitments, post-commit challenge selection, openings, verdicts, and experiment gates |
 
 An implementation conforms to OpenInfer only by naming a core version and one or more service and assurance profiles. Support for the core alone does not imply support for inference or optimistic verification.
@@ -55,7 +56,7 @@ The protocol family should be implemented in this order:
 
 1. Encode and validate the core signed envelope in two languages.
 2. Publish cross-language canonicalization, digest, and signature fixtures.
-3. Implement `Offer`, `Request`, `Agreement`, `ExecutionCommitment`, `Receipt`, `ReceiptAcceptance`, `Finalization`, and settlement processing in shadow mode.
+3. Implement `Offer`, `Request`, `Agreement`, `ExecutionCommitment`, `Receipt`, `ReceiptAcceptance`, `Finalization`, and settlement processing in shadow mode using `oi.signed-receipt/0.1`.
 4. Implement the inference profile with deterministic artifact identity and usage calculation.
 5. Map the objects onto Fluxyard's existing Offer-to-Charge path without changing real settlement.
 6. Add the optimistic profile only after an ordinary signed receipt survives restart, replay, timeout, and evidence-gap tests.
@@ -77,7 +78,7 @@ The experimental optimistic profile advances only if measured evidence supports 
 | Operational safety | Shadow settlement survives duplicate delivery, restart, timeout, and missing evidence without duplicate effects |
 | Independent verification | Two verifier implementations produce the same verdict from the same evidence |
 
-The percentages are research targets, not protocol guarantees.
+The percentages are research targets, not protocol guarantees. The [E0–E7 research plan](RESEARCH.md) preserves the methods, controls, measurements, and stop conditions required to produce that evidence.
 
 ## 6. Maturity labels
 
@@ -97,6 +98,12 @@ Protocol-semantic changes use pull requests. Each change must state:
 - any new trust or privacy assumption.
 
 Editorial changes may merge without a version change. A change to signed bytes or normative behavior requires a new draft version.
+
+### 7.1 Review revision and compatibility
+
+This revision selects `oi-core/0.2`, `oi.inference/0.2`, `oi.optimistic/0.2`, and `oi.settlement-policy.mock/0.2`; `oi.signed-receipt/0.1` is new. The cryptographic suite remains unchanged, but the signed-envelope domain is now `openinfer-signed-envelope-v0.2`. Old signed objects MUST NOT be silently converted or combined with this version's transaction history. A new purchase uses new signatures and identifiers.
+
+The changes add output/usage commitments and OpeningAcceptance, enforce one purchase per request and sufficient same-asset reservation, change replay-before-expiry validation, and close policy registries. The baseline continues to trust one buyer/finalizer for acceptance and observed delivery times. [Runnable examples and regression checks](../tests/protocol-cases.mjs) cover the review cases; full cross-language conformance artifacts remain the next implementation milestone.
 
 ## 8. Open questions
 
