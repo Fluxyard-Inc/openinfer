@@ -11,10 +11,11 @@
   <meta property="og:url" content="https://openinfer.network/">
   <title>OpenInfer — An open protocol for the machine economy.</title>
   <link rel="canonical" href="https://openinfer.network/">
-  <link rel="stylesheet" href="site.css?v=chapter15">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="site.css?v=essay4">
 </head>
 <body>
-  <a class="skip-link" href="#contents">Skip to the manifesto</a>
+  <a class="skip-link" href="#contents">Skip to the paper</a>
 
   <header class="site-header">
     <a class="mark" href="#top" aria-label="OpenInfer home"><span>O/I</span> OpenInfer</a>
@@ -22,7 +23,7 @@
       <a href="#contents">Contents</a>
       <a href="#protocol">Protocol</a>
       <a href="#verification">Verification</a>
-      <a href="#roadmap">Roadmap</a>
+      <a href="#roadmap">Research</a>
     </nav>
     <a class="header-link" href="https://github.com/Fluxyard-Inc/openinfer">Source ↗</a>
   </header>
@@ -30,44 +31,42 @@
   <main>
     <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="hero-content">
-        <p class="eyebrow hero-eyebrow"><span>Manifesto 001</span><span>September 2026</span></p>
+        <p class="eyebrow hero-eyebrow"><span>OpenInfer paper 001</span><span>September 2026</span></p>
         <h1 id="hero-title"><span>OpenInfer</span></h1>
         <div class="hero-bottom">
           <p>An open protocol for the machine economy.</p>
-          <a class="read-link" href="#contents">Read the manifesto <span aria-hidden="true">↓</span></a>
+          <a class="read-link" href="#contents">Read the paper <span aria-hidden="true">↓</span></a>
         </div>
       </div>
     </section>
 
     <section class="contents" id="contents" aria-label="Contents">
       <div class="contents-intro reveal">
-        <p class="section-label">Manifesto / 6 chapters / ~15 min</p>
+        <p class="section-label">Paper / 4 sections / ~10 min</p>
 
 
       </div>
       <ol class="contents-list">
-        <li class="reveal"><a href="#vision"><span>01</span><strong>The need</strong><small>Why autonomous machines require their own economic primitives.</small></a></li>
+        <li class="reveal"><a href="#vision"><span>01</span><strong>The premise</strong><small>Why agents need programmable procurement.</small></a></li>
         <li class="reveal"><a href="#protocol"><span>02</span><strong>The protocol</strong><small>How strangers discover, transact, and settle without a privileged router.</small></a></li>
         <li class="reveal"><a href="#verification"><span>03</span><strong>The trust model</strong><small>Receipts, challenges, progressive assurance, and economic security.</small></a></li>
-        <li class="reveal"><a href="#economy"><span>04</span><strong>The agent economy</strong><small>What changes when software can independently purchase useful work.</small></a></li>
-        <li class="reveal"><a href="#roadmap"><span>05</span><strong>The path</strong><small>From Fluxyard’s GPU market to an open market for machine services.</small></a></li>
-        <li class="reveal"><a href="#principles"><span>06</span><strong>The principles</strong><small>The constraints that keep OpenInfer open, useful, and accountable.</small></a></li>
+        <li class="reveal"><a href="#roadmap"><span>04</span><strong>The research program</strong><small>What Fluxyard can establish, what remains unproven, and how to test it.</small></a></li>
       </ol>
     </section>
 
     <section class="thesis section-grid reveal" id="vision" aria-labelledby="vision-title">
-      <p class="section-label">Chapter I · 00 / The vision</p>
+      <p class="section-label">01 / The premise</p>
       <div>
-        <h2 id="vision-title">Any machine should be able to buy intelligence from any other machine.</h2>
-        <p class="lede">Without permission, prior relationships, or blind trust.</p>
-        <p>AI is becoming autonomous. Agents can reason, write software, search, operate computers, and manage workflows. But the infrastructure beneath them still depends on accounts and commercial relationships established by humans. An agent can consume services. It cannot truly procure them.</p>
+        <h2 id="vision-title">Why agents need programmable procurement.</h2>
+        <p class="lede">An agent can decide what to do. It still cannot independently decide whom to do business with.</p>
+        <p>Agents can reason, write software, search, operate computers, and manage workflows. But the infrastructure beneath them still depends on accounts, API keys, billing relationships, and vendor lists established by humans. OpenInfer asks whether software can discover a service, agree to terms, verify delivery, and settle payment with a provider it has never met.</p>
       </div>
     </section>
 
     <section class="contrast-section reveal" aria-labelledby="contrast-title">
       <div class="contrast-heading">
-        <p class="section-label">Chapter I · 01 / The missing layer</p>
-        <h2 id="contrast-title">Humans have institutions.<br>Machines need primitives.</h2>
+        <p class="section-label">Two trust models</p>
+        <h2 id="contrast-title">Commercial infrastructure was built for organizations, not autonomous software.</h2>
       </div>
       <div class="contrast-grid">
         <article>
@@ -93,17 +92,12 @@
       </div>
     </section>
 
-    <section class="declaration reveal" aria-label="OpenInfer thesis">
-      <p class="section-label">The thesis</p>
-      <blockquote>Autonomous agents need a permissionless way to discover, purchase, verify, and pay other machines for intelligence and computation.</blockquote>
-    </section>
-
     <section class="system reveal" id="protocol" aria-labelledby="protocol-title">
       <div class="section-grid system-intro">
-        <p class="section-label">Chapter II · 02 / The protocol</p>
+        <p class="section-label">02 / The protocol</p>
         <div>
-          <h2 id="protocol-title">A complete transaction between strangers.</h2>
-          <p class="lede">OpenInfer provides the economic control loop. Providers and buyers remain replaceable.</p>
+          <h2 id="protocol-title">The transaction lifecycle.</h2>
+          <p class="lede">OpenInfer defines a common loop for purchasing work. Providers, buyers, gateways, and settlement rails remain replaceable.</p>
         </div>
       </div>
       <ol class="spine protocol-spine" aria-label="OpenInfer protocol loop">
@@ -118,8 +112,8 @@
 
     <section class="market-section" aria-labelledby="market-title">
       <div class="market-copy reveal">
-        <p class="section-label">Chapter II · 03 / The first market</p>
-        <h2 id="market-title">Begin with open-model inference.</h2>
+        <p class="section-label">Initial market</p>
+        <h2 id="market-title">Open-model inference.</h2>
         <p>Inference is the first service that makes every part of the protocol concrete: capability, price, performance, usage, artifact identity, verification, and settlement.</p>
         <p>A provider should be able to announce a model, endpoint, price, stake, and execution profile—and compete for traffic without an application, sales call, or preferred-provider agreement.</p>
       </div>
@@ -141,10 +135,10 @@
 
     <section class="router-section reveal" aria-labelledby="router-title">
       <div class="section-grid">
-        <p class="section-label">Chapter II · 04 / Market, not middleman</p>
+        <p class="section-label">Design constraint</p>
         <div>
-          <h2 id="router-title">OpenInfer is not the router.</h2>
-          <p class="lede">It is the market underneath every router.</p>
+          <h2 id="router-title">No privileged router.</h2>
+          <p class="lede">The protocol describes the market; it does not dictate the buyer&rsquo;s decision.</p>
           <p>Fluxyard may bootstrap the first product: a familiar compute marketplace and gateway built on OpenInfer. It must never become indispensable. Anyone can build another router; an agent can query competing offers directly and route its own work. OpenInfer exposes supply. The buyer decides what “best” means.</p>
         </div>
       </div>
@@ -211,9 +205,9 @@
     </section>
 
     <section class="offchain-section reveal" aria-labelledby="offchain-title">
-      <p class="section-label">Chapter II · 05 / A boundary</p>
+      <p class="section-label">Execution boundary</p>
       <div>
-        <h2 id="offchain-title">Trust-minimized does not mean putting AI on a blockchain.</h2>
+        <h2 id="offchain-title">Compute stays off-chain.</h2>
         <p>Prompts do not need consensus. Transformer operations do not belong in smart contracts. Latency-sensitive computation remains a direct path from buyer to provider to hardware.</p>
         <p>The protocol lives around the work: identity, discovery, commitment, verification, reputation, and settlement. Blockchain infrastructure may provide useful primitives for some of these functions. It is not the product.</p>
       </div>
@@ -221,8 +215,8 @@
 
     <section class="verification" id="verification" aria-labelledby="verification-title">
       <div class="verification-heading reveal">
-        <p class="section-label">Chapter III · 06 / Verification</p>
-        <h2 id="verification-title">A receipt is a claim.<br>Verification makes it accountable.</h2>
+        <p class="section-label">03 / The trust model</p>
+        <h2 id="verification-title">What a receipt must prove.</h2>
         <p>When an unknown provider says “I served this model and generated this usage,” the protocol must make five properties legible.</p>
       </div>
 
@@ -237,8 +231,8 @@
 
     <section class="optimistic-section" aria-labelledby="optimistic-title">
       <div class="optimistic-copy reveal">
-        <p class="section-label">Chapter III · 07 / Optimistic verification</p>
-        <h2 id="optimistic-title">Commit first.<br>Challenge after.</h2>
+        <p class="section-label">Optimistic challenge model</p>
+        <h2 id="optimistic-title">Commit before the audit is chosen.</h2>
         <p>The provider returns its output with a signed receipt and a commitment to what happened during execution. Only after that commitment is locked does protocol randomness decide whether—and where—the computation must be opened.</p>
         <p>The provider cannot know in advance which token, layer, expert route, or activation region will be inspected. Most transactions settle cheaply. Random or suspicious transactions escalate.</p>
       </div>
@@ -370,9 +364,9 @@
 
     <section class="assurance-section reveal" aria-labelledby="assurance-title">
       <div class="section-grid">
-        <p class="section-label">Chapter III · 08 / Progressive assurance</p>
+        <p class="section-label">Progressive assurance</p>
         <div>
-          <h2 id="assurance-title">Trust should be purchased in proportion to risk.</h2>
+          <h2 id="assurance-title">Assurance follows transaction risk.</h2>
           <p class="lede">A two-cent request and a ten-million-dollar decision should not carry the same proof burden.</p>
         </div>
       </div>
@@ -388,9 +382,10 @@
 
     <section class="economics-section" aria-labelledby="economics-title">
       <div class="economics-copy reveal">
-        <p class="section-label">Chapter III · 09 / Economic security</p>
-        <h2 id="economics-title">Perfect detection is unnecessary.</h2>
-        <p>The practical objective is to make honest execution more profitable than fraud. Providers place capital behind their claims. Unpredictable audits create detection risk. Proven fraud destroys stake and rewards the challenger who found it.</p>
+        <p class="section-label">Economic security</p>
+        <h2 id="economics-title">Fraud must cost more than honesty.</h2>
+        <p>The practical objective is not perfect detection. Providers place capital behind their claims, unpredictable audits create detection risk, and proven fraud destroys stake. Enforcement must ultimately be open: an independent challenger should be able to prove fraud and earn part of the penalty without permission from OpenInfer.</p>
+        <p>Commerce should settle in stable units. A native asset is justified only if measured protocol use shows that staking, slashing, validation, or governance cannot work without one.</p>
       </div>
       <div class="equation reveal" aria-label="Expected profit from fraud is less than expected loss from detection">
         <span>Expected profit<br>from fraud</span>
@@ -400,77 +395,24 @@
       </div>
     </section>
 
-    <section class="challenger-section reveal" aria-labelledby="challenger-title">
-      <p class="section-label">Chapter III · 10 / Open enforcement</p>
-      <div>
-        <h2 id="challenger-title">Verification must also be permissionless.</h2>
-        <p>A decentralized provider market with a centralized fraud department is not enough. Anyone should eventually be able to challenge execution commitments, prove fraud, and earn part of the penalty. Providers earn by computing. Challengers earn by finding dishonest computation. Neither needs permission from OpenInfer.</p>
-      </div>
-    </section>
-
-    <section class="utility-section reveal" id="economy" aria-labelledby="utility-title">
-      <div>
-        <p class="section-label">Chapter IV · 11 / Useful computation</p>
-        <h2 id="utility-title">Proof of quality matters as much as proof of compute.</h2>
-        <p>A mathematically valid execution can still be a terrible service. Buyers care about quality, price, latency, throughput, availability, context, privacy, and verification. No routing algorithm should be universally privileged.</p>
-      </div>
-      <div class="utility-equation" aria-label="Utility equals quality times performance times reliability times trust, divided by cost">
-        <span>Quality × Performance × Reliability × Trust</span>
-        <hr>
-        <span>Cost</span>
-        <small>Each buyer sets its own weights.</small>
-      </div>
-    </section>
-
-    <section class="money-section reveal" aria-labelledby="money-title">
-      <p class="section-label">Chapter IV · 12 / Money and security</p>
-      <div>
-        <h2 id="money-title">Stable money for commerce.<br>Security only where required.</h2>
-        <p>Agents budget in stable units. They should not need to speculate on a volatile asset to buy inference. Stablecoins are a natural settlement rail for commerce.</p>
-        <p>If a native asset ever improves staking, slashing, validation, or governance, the protocol should earn the right to introduce one. The sequence is utility, market, protocol, demonstrated security need—and only then a token, if necessary.</p>
-      </div>
-    </section>
-
-    <section class="agent-section" aria-labelledby="agent-title">
-      <div class="agent-copy reveal">
-        <p class="section-label">Chapter IV · 13 / Why agents</p>
-        <h2 id="agent-title">The agent becomes an economic actor.</h2>
-        <p>Today an agent operates inside relationships created by its owner: cloud credentials, API keys, billing accounts, and approved vendors. It can decide what to do. It cannot independently decide who to do business with.</p>
-        <p>A wallet and protocol identity change that. An agent can discover a service, evaluate the offer, purchase it, verify delivery, and settle—entirely through software.</p>
-      </div>
-      <div class="agent-budget reveal" aria-label="Example autonomous agent budget and purchases">
-        <div><span>Wallet</span><strong>$37.42 USDC</strong></div>
-        <div><span>Objective</span><strong>Research a biotechnology question</strong></div>
-        <div><span>Budget</span><strong>$10.00</strong></div>
-        <ul>
-          <li><span>Search</span><b>$0.03</b></li>
-          <li><span>Reasoning</span><b>$0.18</b></li>
-          <li><span>Document parsing</span><b>$0.04</b></li>
-          <li><span>Specialist model</span><b>$0.31</b></li>
-          <li><span>GPU compute</span><b>$0.12</b></li>
-          <li><span>Second opinion</span><b>$0.09</b></li>
-        </ul>
-      </div>
-    </section>
-
     <section class="horizon" id="roadmap" aria-labelledby="horizon-title">
       <div class="horizon-heading reveal">
-        <p class="section-label">Chapter V · 14 / The path</p>
-        <h2 id="horizon-title">The machine economy is built in earned steps.</h2>
+        <p class="section-label">04 / The research program</p>
+        <h2 id="horizon-title">From working market to testable protocol.</h2>
       </div>
       <div class="horizon-steps">
         <article class="reveal">
-          <p>Foundation</p>
+          <p>Product foundation</p>
           <h3>Fluxyard marketplace</h3>
           <p>Build the dependable, familiar GPU marketplace first. Make independently operated hardware legible and prove placement, recovery, metering, and settlement with conventional workloads.</p>
         </article>
         <article class="reveal">
-          <p>First market</p>
+          <p>Protocol proposal</p>
           <h3>OpenInfer network</h3>
           <p>Let providers compete to serve open models through machine-readable offers, signed receipts, independent metering, and progressive verification.</p>
         </article>
         <article class="reveal">
-          <p>End state</p>
+          <p>Long-term implication</p>
           <h3>Open machine services</h3>
           <p>Extend the same transaction primitive to compute, data, media, tools, and specialist agents—without making OpenInfer the mandatory buyer or seller.</p>
         </article>
@@ -479,12 +421,12 @@
 
     <section class="service-market reveal" aria-labelledby="services-title">
       <div class="service-heading">
-        <p class="section-label">Chapter V · 15 / Beyond inference</p>
-        <h2 id="services-title">What changes when software can procure work.</h2>
+        <p class="section-label">Beyond inference</p>
+        <h2 id="services-title">A common transaction primitive for machine services.</h2>
         <div class="service-intro">
-          <p>Today an agent can choose what to do, but it still operates inside accounts, API keys, billing relationships, and vendor lists established by a human. Its autonomy ends at the boundary of someone else&rsquo;s commercial agreements.</p>
-          <p>In an open machine-services market, an agent begins with an objective, a budget, and a purchasing policy. It can decompose a job, discover machine-readable offers for each part, compare price and performance against the assurance it requires, then purchase, verify, and settle every contribution independently.</p>
-          <p>OpenInfer does not need to become the universal router for that world. Agents and competing gateways can make their own decisions. The protocol supplies the common language for offers, commitments, receipts, challenges, and settlement.</p>
+          <p>If the inference market works, the same transaction model can extend to compute, data, storage, media, tools, and specialist agents.</p>
+          <p>An agent begins with an objective, budget, and purchasing policy. It composes only the services required, evaluates each offer, and settles each contribution independently.</p>
+          <p>This is an implication, not the initial product. OpenInfer first has to prove that its verification model works for one narrow, measurable service.</p>
         </div>
       </div>
       <figure class="protocol-diagram services-diagram reveal" role="img" aria-labelledby="services-diagram-caption">
@@ -613,7 +555,7 @@
     </section>
 
     <section class="research-section reveal" aria-labelledby="research-title">
-      <p class="section-label">Chapter V · 16 / The research question</p>
+      <p class="section-label">Central research question</p>
       <div>
         <h2 id="research-title">Can optimistic verification make large-model inference economically trust-minimized?</h2>
         <p>For trillion-parameter Mixture-of-Experts models, can a provider cheaply commit to enough of its execution that unpredictable post-commit challenges detect dishonest computation at a tiny fraction of the cost of reproducing the original request?</p>
@@ -630,37 +572,12 @@
       <a class="read-link research-link" href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/PROTOCOL.md">Read the technical draft <span aria-hidden="true">↗</span></a>
     </section>
 
-    <section class="principles" id="principles" aria-labelledby="principles-title">
-      <div class="principles-heading reveal">
-        <p class="section-label">Chapter VI · 17 / Principles</p>
-        <h2 id="principles-title">What guides the protocol.</h2>
-      </div>
-      <ol class="principle-list compact-principles">
-        <li class="reveal"><span class="principle-number">01</span><h3>Permissionless by default.</h3><p>If a participant satisfies the protocol, OpenInfer should not decide whether it belongs.</p></li>
-        <li class="reveal"><span class="principle-number">02</span><h3>Compute stays off-chain.</h3><p>Use decentralized infrastructure around execution, not inside the latency-sensitive path.</p></li>
-        <li class="reveal"><span class="principle-number">03</span><h3>No privileged router.</h3><p>Gateways are clients of the market. An agent must be free to route for itself.</p></li>
-        <li class="reveal"><span class="principle-number">04</span><h3>Claims require receipts.</h3><p>Capability, price, execution, usage, and performance should be machine-readable and challengeable.</p></li>
-        <li class="reveal"><span class="principle-number">05</span><h3>Assurance is progressive.</h3><p>Buy the verification appropriate to the value and risk of the transaction.</p></li>
-        <li class="reveal"><span class="principle-number">06</span><h3>Economics completes cryptography.</h3><p>Make the expected value of fraud negative and reward independent enforcement.</p></li>
-        <li class="reveal"><span class="principle-number">07</span><h3>Utility precedes token design.</h3><p>Real demand, providers, payments, and adversarial behavior come first.</p></li>
-        <li class="reveal"><span class="principle-number">08</span><h3>Reliability earns expansion.</h3><p>Make one strange hardware combination boringly reliable. Then generalize.</p></li>
-      </ol>
-    </section>
-
-    <section class="finale" id="north-star" aria-labelledby="north-star-title">
-      <div class="finale-glow" aria-hidden="true"></div>
-      <p class="section-label">Chapter VI · 18 / Our north star</p>
-      <h2 id="north-star-title">Can two machines that have never met complete a useful economic transaction?</h2>
-      <p class="north-star-copy">Can they discover one another, agree on the purchase of intelligence, execute the work, determine whether the agreement was satisfied, and settle payment—without a trusted intermediary or human intervention?</p>
-      <p class="north-star-answer">If yes, the protocol is working.<br><em>Everything else is implementation.</em></p>
-      <a class="final-link" href="https://github.com/Fluxyard-Inc/fluxyard">Explore the Fluxyard implementation <span aria-hidden="true">↗</span></a>
-    </section>
   </main>
 
   <footer>
     <a class="mark" href="#top" aria-label="Back to top"><span>O/I</span> OpenInfer</a>
     <p>An open protocol for the machine economy.</p>
-    <p>Manifesto / 001</p>
+    <p>Paper / 001</p>
   </footer>
 </body>
 </html>
