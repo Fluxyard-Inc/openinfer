@@ -18,7 +18,7 @@ OpenInfer specifies economic transactions between software buyers and machine-se
 | [OI-CORE-0001](core/OI-CORE-0001.md) | Implementable baseline | Signed objects, canonical encoding, transaction state, replay handling, errors, and settlement outcomes |
 | [OI-PROFILE-INFERENCE-0001](profiles/OI-PROFILE-INFERENCE-0001.md) | Implementable baseline | Open-model inference offers, requests, execution profiles, usage claims, and receipts |
 | [OI-PROFILE-SIGNED-RECEIPT-0001](profiles/OI-PROFILE-SIGNED-RECEIPT-0001.md) | Implementable baseline | Buyer-checked delivery, ordinary signed receipts, and simulated settlement |
-| [OI-PROFILE-OPTIMISTIC-0001](profiles/OI-PROFILE-OPTIMISTIC-0001.md) | Experimental | Trace commitments, post-commit challenge selection, openings, verdicts, and experiment gates |
+| [OI-PROFILE-OPTIMISTIC-0001](profiles/OI-PROFILE-OPTIMISTIC-0001.md) | Experimental; paused | Trace commitments and challenge rules; outside the current pilot |
 
 An implementation conforms to OpenInfer only by naming a core version and one or more service and assurance profiles. Support for the core alone does not imply support for inference or optimistic verification.
 
@@ -52,33 +52,31 @@ Fluxyard's control plane and database remain trusted. It does not yet provide pe
 
 ## 4. Implementation sequence
 
-The protocol family should be implemented in this order:
+Start with the [practical research plan](RESEARCH.md): establish a recurring buyer need, deliver through a known provider, and measure full cost and repeat use. Existing Fluxyard capabilities are sufficient to begin that investigation; implementing the entire draft is not an entry requirement.
 
-1. Encode and validate the core signed envelope in two languages.
-2. Publish cross-language canonicalization, digest, and signature fixtures.
-3. Implement `Offer`, `Request`, `Agreement`, `ExecutionCommitment`, `Receipt`, `ReceiptAcceptance`, `Finalization`, and settlement processing in shadow mode using `oi.signed-receipt/0.1`.
-4. Implement the inference profile with deterministic artifact identity and usage calculation.
-5. Map the objects onto Fluxyard's existing Offer-to-Charge path without changing real settlement.
-6. Add the optimistic profile only after an ordinary signed receipt survives restart, replay, timeout, and evidence-gap tests.
+Where portable signed records remove demonstrated coordination work:
 
-Real stake, slashing, public providers, and a native asset are outside this sequence.
+1. Map the selected service's accepted terms, workload identity, delivery, and usage evidence onto Fluxyard's existing Offer-to-Charge path.
+2. Implement and validate the complete required transaction path for the selected core, service, and signed-receipt profiles in shadow mode. A partial pilot record must not be described as protocol-conformant.
+3. Exercise restart, replay, timeout, and evidence-gap cases without duplicate effects or silent evidence loss.
+4. Add cross-language canonicalization, digest, and signature fixtures when a second implementation is needed; two interoperable implementations remain required for candidate maturity.
 
-## 5. Research gates
+OpenInfer settlement remains simulated. Commercial pilots require separately approved ordinary billing and Fluxyard's operational gates. Real stake, slashing, permissionless admission, and a native asset are outside this sequence. Optimistic verification requires a separate decision under the practical plan, not automatic progression from signed receipts.
 
-The experimental optimistic profile advances only if measured evidence supports it:
+## 5. Practical research gates
+
+The current pilot advances on evidence of useful transactions:
 
 | Gate | Required result |
 | --- | --- |
-| Stable execution profile | Honest implementations have documented, bounded divergence |
-| Commitment overhead | The selected trace density adds less than 3% service overhead |
-| Challenge cost | One selected transition can be checked for less than 0.1% of the original request cost |
-| Numeric correctness | Honest false positives remain low while tested shortcuts remain distinguishable |
-| Adversarial detection | Detection curves are published for substitution, skipped work, altered routing, and selective cheating |
-| Economic viability | At least one conservative parameter region makes expected fraud value negative |
-| Operational safety | Shadow settlement survives duplicate delivery, restart, timeout, and missing evidence without duplicate effects |
-| Independent verification | Two verifier implementations produce the same verdict from the same evidence |
+| Buyer need | One recurring workload, a current alternative, an accepted price, and measurable acceptance criteria |
+| Accountable delivery | Buyer-accepted output, traceable terms and usage, and explicit failure handling |
+| Repeat use | The buyer chooses further representative jobs; internal demos and simulated payments do not establish demand |
+| Delivery economics | Full recurring costs and operator effort are acceptable, or one bounded fix can be tested |
+| Operational safety | The pilot path survives duplicate delivery, restart, timeout, and missing evidence without duplicate charges or silent evidence loss |
+| Assurance escalation | A specific unmet trust requirement justifies a budgeted comparison with simpler audits |
 
-The percentages are research targets, not protocol guarantees. The [E0–E7 research plan](RESEARCH.md) preserves the methods, controls, measurements, and stop conditions required to produce that evidence.
+The [practical research plan](RESEARCH.md) defines the four-week method and stop decisions. The former E0–E7 program and fixed percentage targets are superseded; their prior text remains in Git history. The optimistic profile remains paused and unproven.
 
 ## 6. Maturity labels
 
@@ -103,10 +101,13 @@ Editorial changes may merge without a version change. A change to signed bytes o
 
 This revision selects `oi-core/0.2`, `oi.inference/0.2`, `oi.optimistic/0.2`, and `oi.settlement-policy.mock/0.2`; `oi.signed-receipt/0.1` is new. The cryptographic suite remains unchanged, but the signed-envelope domain is now `openinfer-signed-envelope-v0.2`. Old signed objects MUST NOT be silently converted or combined with this version's transaction history. A new purchase uses new signatures and identifiers.
 
-The changes add output/usage commitments and OpeningAcceptance, enforce one purchase per request and sufficient same-asset reservation, change replay-before-expiry validation, and close policy registries. The follow-up review adds separate receipt-delivery/validation deadlines, signed receipt observations, bounded short-output sampling, a complete Verdict schema, and explicit operator handling of simulated indeterminate holds. The baseline continues to trust one buyer/finalizer for acceptance and observed delivery times. [Runnable examples and regression checks](../tests/protocol-cases.mjs) cover the review cases and explicitly distinguish sequential models from pending database concurrency tests; full cross-language conformance artifacts remain the next implementation milestone.
+The changes add output/usage commitments and OpeningAcceptance, enforce one purchase per request and sufficient same-asset reservation, change replay-before-expiry validation, and close policy registries. The follow-up review adds separate receipt-delivery/validation deadlines, signed receipt observations, bounded short-output sampling, a complete Verdict schema, and explicit operator handling of simulated indeterminate holds. The baseline continues to trust one buyer/finalizer for acceptance and observed delivery times. [Runnable examples and regression checks](../tests/protocol-cases.mjs) cover the review cases and explicitly distinguish sequential models from pending database concurrency tests; full cross-language conformance artifacts remain necessary before candidate maturity. The practical-plan revision changes research priorities, not signed bytes, profile identifiers, validation, or settlement behavior.
 
 ## 8. Open questions
 
+- Which recurring workload gives a buyer a measurable reason to use Fluxyard?
+- Does repeat delivery remain worthwhile after accounting for failures and operator time?
+- Which coordination or trust problem requires additional protocol machinery?
 - Can the optimistic profile verify a useful checkpoint without loading most expert weights or request context?
 - What numeric rule separates honest implementation variance from useful cheating?
 - Which randomness source is unpredictable, bias-resistant, available, and cheap enough?

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Profile identifier | **oi.optimistic/0.2** |
-| Status | **Experimental** |
+| Status | **Experimental; research paused** |
 | Core dependency | **oi-core/0.2** |
 | Initial service dependency | **oi.inference/0.2** |
 | Last updated | **2026-09-04** |
@@ -13,6 +13,8 @@
 This assurance profile defines an implementable experiment for committing to selected inference checkpoints and opening unpredictable checkpoints after execution. It standardizes experiment inputs and verdicts; it does not claim that sampling proves a complete large-model execution.
 
 No deployment may describe this profile as trustless, cryptographically proven inference, or production-ready.
+
+This profile is outside the current [practical research plan](../RESEARCH.md). Its wire rules remain a draft reference; implementation resumes only if a bounded comparison shows that simpler assurance methods leave a material gap for a real workload.
 
 ## 2. Intended guarantee
 
@@ -73,7 +75,7 @@ The initial MoE checkpoint profile is:
 }
 ```
 
-`index` values are contiguous `UIntString` values beginning at `0`. Checkpoints cover the Cartesian product of generated output-token indices `0, stride, 2*stride, ... < output_tokens` and model-layer indices `0, stride, 2*stride, ... < layer_count`, ordered first by token and then by layer. The execution profile defines tensor shape, element representation, quantization, digest layout, routing rules, accepted numeric tolerance, and the contents of replay context. A checkpoint lacking those definitions is unverifiable and MUST be rejected. The versioned checkpoint/verifier specification MUST additionally define how the committed request and output token sequence determine each sampled token's prefix/replay context and how the sampled computation is connected to that token's output distribution and sampling decision. A mere locally consistent transition on provider-chosen activations is insufficient. These definitions remain an E0/E2 research deliverable; a deployment MUST reject an unsupported specification rather than report a valid verdict.
+`index` values are contiguous `UIntString` values beginning at `0`. Checkpoints cover the Cartesian product of generated output-token indices `0, stride, 2*stride, ... < output_tokens` and model-layer indices `0, stride, 2*stride, ... < layer_count`, ordered first by token and then by layer. The execution profile defines tensor shape, element representation, quantization, digest layout, routing rules, accepted numeric tolerance, and the contents of replay context. A checkpoint lacking those definitions is unverifiable and MUST be rejected. The versioned checkpoint/verifier specification MUST additionally define how the committed request and output token sequence determine each sampled token's prefix/replay context and how the sampled computation is connected to that token's output distribution and sampling decision. A mere locally consistent transition on provider-chosen activations is insufficient. These definitions remain unresolved research prerequisites; a deployment MUST reject an unsupported specification rather than report a valid verdict.
 
 ## 5. Merkle commitment
 
@@ -325,7 +327,7 @@ An `indeterminate_verdict` hold intentionally leaves the simulated reservation l
 
 The profile does not define a token, stake asset, penalty size, challenger reward, or chain. Those parameters require measured audit cost and adversarial results.
 
-The reproducible methods, controls, and stop conditions are in [Research plan E0–E7](../RESEARCH.md).
+The [practical research plan](../RESEARCH.md#when-assurance-research-is-justified) defines when a new assurance comparison is justified and which controls it needs. The earlier E0–E7 program remains in Git history.
 
 ## 12. Experiment measurements
 
@@ -340,7 +342,7 @@ Every run records:
 - provider opening failures and verifier errors; and
 - computed fraud economics under stated assumptions.
 
-The working research targets are less than 3% service overhead and less than 0.1% of original request cost for one transition. Missing either target does not create a protocol violation; it blocks maturity advancement.
+The former fixed service-overhead and single-transition-cost targets are retired. Any resumed experiment must predefine workload-specific limits for total audit cost, honest false alarms, detection probability, and buyer exposure, then compare against simpler methods. Include cold and warm verification, loading, transfer, storage, and operator effort. These are research acceptance criteria, not wire-level validation rules.
 
 ## 13. Required attacks
 
@@ -373,7 +375,7 @@ Results are reported as detection curves, not a single accuracy number.
 This profile remains experimental until:
 
 1. honest numeric variance is bounded by a published checkpoint profile;
-2. commitment and verification cost targets are measured on a named model and hardware configuration;
+2. predeclared aggregate cost and detection criteria are met on a named workload and hardware configuration, with a demonstrated benefit over simpler assurance methods;
 3. all required attacks have published results;
 4. economic modeling finds a conservative negative-fraud-value region;
 5. Fluxyard shadow mode survives replay, restart, timeout, and evidence gaps;

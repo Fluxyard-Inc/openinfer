@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A research proposal for software to purchase machine services through signed agreements, accountable receipts, and explicit verification policies.">
+  <meta name="description" content="An open machine-service transaction proposal, starting with a four-week pilot of repeat demand, accountable delivery, and practical costs through Fluxyard.">
   <meta name="theme-color" content="#f5f2ec">
   <meta property="og:type" content="website">
   <meta property="og:title" content="OpenInfer — An open protocol for the machine economy.">
-  <meta property="og:description" content="The transaction protocol, its trust boundaries, and the experiments needed to test inexpensive inference verification.">
+  <meta property="og:description" content="One buyer, one known provider, and one recurring workload. Test useful transactions before expanding the protocol or resuming verification research.">
   <meta property="og:url" content="https://openinfer.network/">
   <title>OpenInfer — An open protocol for the machine economy.</title>
   <link rel="canonical" href="https://openinfer.network/">
@@ -28,8 +28,8 @@
       <p class="metadata">Research paper 001 · <time datetime="2026-09-04">4 September 2026</time> · Fluxyard</p>
       <h1>OpenInfer</h1>
       <p class="subtitle">An open protocol for the machine economy.</p>
-      <p>OpenInfer proposes a common way for software to purchase machine services from unfamiliar providers. It separates the transaction—offers, agreements, receipts, and settlement—from the harder question of how to verify the work.</p>
-      <p class="status-note"><strong>Current status.</strong> Draft 0001 specifies a prototype baseline for buyer-accepted signed receipts and simulated settlement. Optimistic execution verification remains experimental. Trust-minimized inference, real stake, and slashing have not been demonstrated.</p>
+      <p>OpenInfer proposes a common way for software to purchase machine services. The first test is practical: help one buyer obtain a recurring service from one known provider through Fluxyard, with clear terms, accountable delivery, and a reason to return.</p>
+      <p class="status-note"><strong>Current status.</strong> The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">four-week pilot plan</a> tests demand, delivery, cost, and operator effort. No pilot results are implied. Draft 0001 specifies a prototype baseline for buyer-accepted signed receipts and simulated settlement. Optimistic execution verification remains experimental and research is paused.</p>
     </header>
 
     <nav class="contents" id="contents" aria-label="Contents">
@@ -38,7 +38,7 @@
         <li><a href="#vision"><span>01</span> Problem and thesis</a></li>
         <li><a href="#protocol"><span>02</span> One transaction</a></li>
         <li><a href="#verification"><span>03</span> Verification and its limits</a></li>
-        <li><a href="#roadmap"><span>04</span> Research and implications</a></li>
+        <li><a href="#roadmap"><span>04</span> Practical pilot and decisions</a></li>
       </ol>
     </nav>
 
@@ -48,13 +48,13 @@
       <p>Agents can already call tools and choose among services. Their purchasing authority usually comes from accounts, credentials, budgets, and vendors arranged by people. The difficult step is not choosing another endpoint: it is agreeing to bounded terms with a new counterparty, deciding what counts as delivery, and recovering when that counterparty fails.</p>
       <p>Established providers, contracts, and conventional billing often solve this well. OpenInfer is worth pursuing only where a shared transaction format can reduce repeated integration and coordination costs without replacing them with greater verification, capital, or operational costs.</p>
 
-      <h3 id="research-title">The central research question</h3>
-      <p>Can an inference provider commit to evidence of its execution cheaply enough that unpredictable audits make dishonest computation uneconomic, at a small fraction of the cost of repeating the request?</p>
-      <p>This is a hypothesis, not a property of the current protocol. A signature makes a claim attributable; it does not make the claim true. The research must establish whether sampled evidence is meaningfully connected to the delivered output, whether honest implementations agree, and whether useful cheating can be distinguished from normal numerical variation.</p>
+      <h3 id="research-title">The first question to answer</h3>
+      <p>Can one buyer repeatedly obtain a useful machine service with a clear advantage over their current approach, after accounting for delivery failures, full cost, and operator effort?</p>
+      <p>Begin with a known provider and human-approved spending limits. Permissionless participation is a separate hypothesis. A signature makes a claim attributable; it does not make the claim true. Add assurance research only when a specific unmet trust requirement justifies comparing it with ordinary delivery checks and provider audits.</p>
 
-      <h3>Why begin with inference?</h3>
-      <p>Open-model inference gives the proposal a bounded first service: a specified model, a request, output tokens, measurable usage, and a price. Start with one accessible model and a fixed execution profile. Larger Mixture-of-Experts models are a later scaling question, not a prerequisite for the first experiment.</p>
-      <p>The protocol can still be useful as accountable transaction infrastructure if inexpensive execution verification fails. That narrower outcome should be evaluated on its own merits.</p>
+      <h3>Choose the workload with the buyer</h3>
+      <p>Start with one bounded workload that Fluxyard's existing Docker execution path supports. Open-model inference is a candidate when a buyer needs it: a specified model, a request, output tokens, measurable usage, and a price. No particular model family or new Runtime is a prerequisite.</p>
+      <p>A useful pilot would justify improving that service. It would not establish demand for a broad marketplace or prove that decentralized verification is feasible.</p>
     </section>
 
     <section class="paper-section" id="protocol" aria-labelledby="protocol-title">
@@ -144,14 +144,15 @@
         <thead><tr><th scope="col">Mechanism</th><th scope="col">What it can establish</th><th scope="col">Boundary</th></tr></thead>
         <tbody>
           <tr><th scope="row">Signed receipt + buyer checks</th><td data-label="Evidence">Attribution, agreed terms, delivered bytes, and profile-defined usage checks.</td><td data-label="Boundary">Specified baseline; trusts the buyer/finalizer. No execution proof.</td></tr>
-          <tr><th scope="row">Optimistic trace challenge</th><td data-label="Evidence">Whether selected committed evidence passes a specified verifier.</td><td data-label="Boundary">Experimental; output linkage, detection, privacy, and cost remain research questions.</td></tr>
+          <tr><th scope="row">Provider audits</th><td data-label="Evidence">Measured task quality, delivery reliability, and deviations from agreed checks.</td><td data-label="Boundary">Operator-mediated evidence; does not prove every execution or the absence of fraud.</td></tr>
+          <tr><th scope="row">Optimistic trace challenge</th><td data-label="Evidence">Whether selected committed evidence passes a specified verifier.</td><td data-label="Boundary">Research paused; output linkage, detection, privacy, and cost remain unresolved.</td></tr>
           <tr><th scope="row">TEE attestation</th><td data-label="Evidence">Execution within an attested hardware-backed environment.</td><td data-label="Boundary">Possible future profile; depends on hardware, attestation, and implementation assumptions.</td></tr>
           <tr><th scope="row">Cryptographic proof</th><td data-label="Evidence">A formally encoded computation statement, under the proof system’s assumptions.</td><td data-label="Boundary">Possible future profile; statement coverage and practical proving cost must be established.</td></tr>
         </tbody>
       </table>
 
-      <h3 id="optimistic-title">The experimental audit path</h3>
-      <p>In the experimental design, the provider commits to the output, usage, and a trace before audit randomness is available. A challenge selects evidence to open; a verifier checks it against the agreed execution profile. An internally consistent trace is insufficient if it can be fabricated independently of the request and returned output.</p>
+      <h3 id="optimistic-title">Deferred: the experimental audit path</h3>
+      <p>This design is outside the current pilot. It would need to demonstrate a useful improvement over simpler audits before implementation resumes. The provider commits to the output, usage, and a trace before audit randomness is available. A challenge selects evidence to open; a verifier checks it against the agreed execution profile. An internally consistent trace is insufficient if it can be fabricated independently of the request and returned output.</p>
       <p>The diagram shows the experiment’s decision paths, not observed network behavior. An unaudited receipt may proceed under the agreed policy after the challenge window; that is an economic choice, not a proof that the request was executed faithfully.</p>
       <figure class="protocol-diagram verification-diagram" role="img" aria-labelledby="verification-diagram-caption">
 <svg class="diagram-desktop" viewBox="0 0 760 570" aria-hidden="true" focusable="false">
@@ -235,20 +236,20 @@
     </section>
 
     <section class="paper-section" id="roadmap" aria-labelledby="roadmap-title">
-      <p class="section-label">04 / Research and implications</p>
+      <p class="section-label">04 / Practical pilot and decisions</p>
       <h2 id="roadmap-title">What would justify the next step?</h2>
       <p><a href="https://fluxyard.ai/">Fluxyard</a> already has a trusted GPU-market transaction path: revisioned offers, immutable accepted terms, usage evidence, and append-only charges. Its control plane and database are trusted. Those patterns are a starting point for OpenInfer, not evidence of permissionless providers, independent verification, or decentralized settlement. The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/PROTOCOL.md#3-current-boundary">draft’s evidence map</a> makes that distinction explicit.</p>
-      <p>The next implementation milestone is a cross-language set of signed-object fixtures and a shadow transaction through Fluxyard. Existing <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/tests/protocol-cases.mjs">runnable examples</a> cover selected cases; they are not a complete conformance suite or a working inference network.</p>
+      <p>The next milestone is an agreed pilot with a real buyer and a known provider. Use existing capabilities first, adding portable signed records where they remove demonstrated coordination work. Existing <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/tests/protocol-cases.mjs">runnable examples</a> cover selected protocol cases; they do not establish buyer demand or complete conformance.</p>
 
-      <h3>Experiments and stop conditions</h3>
-      <p>Each experiment should publish its code revision, model and hardware configuration, control runs, raw measurements, uncertainty, failures, and advance-or-stop decision. The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">E0–E7 research plan</a> contains the procedures.</p>
+      <h3>A four-week test with stop decisions</h3>
+      <p>The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">practical research plan</a> defines the evidence and gates. Before starting, name an owner and agree the spending cap, delivery criteria, data permissions, and acceptable cost and operator effort.</p>
       <ol class="experiment-list">
-        <li><strong>Fix the execution profile · E0, E3.</strong> Measure honest divergence across runtimes, kernels, and precision. Stop exact-transition verification if useful cheating cannot be separated from ordinary numerical variation.</li>
-        <li><strong>Measure commitments and replay · E1, E2.</strong> Target less than 3% service overhead and less than 0.1% of original request cost for one challenged transition. Include weight loading, transfer, and cold-verifier costs. These are research targets, not achieved results.</li>
-        <li><strong>Attack and price the design · E4, E5.</strong> Test substitute models, skipped work, altered routes, and fabricated traces paired with different outputs. Publish detection curves and aggregate audit cost. Do not advance if a useful shortcut remains profitable or security needs implausible capital or subsidies.</li>
-        <li><strong>Rehearse failure and independent review · E6, E7.</strong> Exercise restart, duplicate delivery, missing evidence, and verifier timeout without real funds. Require two independent verifiers to agree on the same evidence before progressing toward open challenges.</li>
+        <li><strong>Week 1 · Establish the need.</strong> Find one recurring workload, document the buyer's current alternative, and agree a price and measurable reason to switch. Pause the build if no credible buyer advantage emerges.</li>
+        <li><strong>Week 2 · Deliver one accountable job.</strong> Use the existing Fluxyard path. Obtain buyer acceptance, reconcile terms and usage, and exercise retry, restart, missing evidence, and provider failure without duplicate charges or silent evidence loss.</li>
+        <li><strong>Week 3 · Measure repeat use.</strong> Seek at least two further representative jobs on separate occasions. Include failures, subsidies, transfer, retries, audit costs, and operator labor. Simulated payments are not revenue or proof of willingness to pay.</li>
+        <li><strong>Week 4 · Decide.</strong> Continue a useful service, timebox one measured fix, investigate one concrete trust gap, or pause/change the workload. A successful demo alone does not justify expanding the protocol.</li>
       </ol>
-      <p>If the simple sampling design fails, compare replication, trusted execution, or proof systems against the same workload and cost model. A negative result should narrow the protocol’s claims and guide the next experiment.</p>
+      <p>OpenInfer settlement stays simulated; any commercial pilot requires separately approved ordinary billing and Fluxyard's operational gates. If a trust gap later warrants research, compare operator audits and existing reference-based methods before custom trace verification. Judge aggregate cost, false alarms, detection, and buyer exposure together. The former E0–E7 program is superseded and remains in Git history.</p>
 
       <h3 id="services-title">Beyond inference</h3>
       <p>If one service works, an agent could purchase data, computation, storage, or specialist work through the same transaction envelope. A research agent might buy a dataset, run an analysis, and commission an independent review, settling each contribution separately.</p>
@@ -363,7 +364,7 @@
       <h3>Documents and foundations</h3>
       <ul class="references">
         <li><a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/PROTOCOL.md">Protocol Draft 0001</a> — core, inference, signed-receipt, and experimental assurance profiles, with maturity labels.</li>
-        <li><a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">Research plan E0–E7</a> — methods, measurements, controls, and stop conditions.</li>
+        <li><a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">Practical research plan</a> — a four-week pilot of buyer demand, accountable delivery, repeat use, costs, and stop decisions.</li>
         <li><a href="https://www.rfc-editor.org/rfc/rfc8785.html">RFC 8785</a> and <a href="https://www.rfc-editor.org/rfc/rfc8032.html">RFC 8032</a> — the draft’s JSON canonicalization and Ed25519 signature foundations. They support reproducible signed claims, not proof of model execution.</li>
       </ul>
       <p class="publication-note">This paper explains the proposal; the versioned draft defines its wire rules. OpenInfer Draft 0001 is a project research draft, not an IETF RFC or an adopted standard. Corrections and counterexamples are welcome through the <a href="https://github.com/Fluxyard-Inc/openinfer">source repository</a>.</p>
