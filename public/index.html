@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="An open machine-service transaction proposal, starting with a four-week pilot of repeat demand, accountable delivery, and practical costs through Fluxyard.">
+  <meta name="description" content="An open machine-service transaction proposal, starting with a four-week pilot of repeat demand, accountable delivery, and practical costs through fluxyard.">
   <meta name="theme-color" content="#f5f2ec">
   <meta property="og:type" content="website">
   <meta property="og:title" content="OpenInfer — An open protocol for the machine economy.">
@@ -25,10 +25,10 @@
   </header>
   <main>
     <header class="paper-header">
-      <p class="metadata">Research paper 001 · <time datetime="2026-09-04">4 September 2026</time> · Fluxyard</p>
+      <p class="metadata">Research paper 001 · <time datetime="2026-09-04">4 September 2026</time> · Fluxyard, Inc.</p>
       <h1>OpenInfer</h1>
       <p class="subtitle">An open protocol for the machine economy.</p>
-      <p>OpenInfer proposes a common way for software to purchase machine services. The first test is practical: help one buyer obtain a recurring service from one known provider through Fluxyard, with clear terms, accountable delivery, and a reason to return.</p>
+      <p>OpenInfer proposes a common way for software to purchase machine services. The first test is practical: help one buyer obtain a recurring service from one known provider through fluxyard, with clear terms, accountable delivery, and a reason to return.</p>
       <p class="status-note"><strong>Current status.</strong> The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">four-week pilot plan</a> tests demand, delivery, cost, and operator effort. No pilot results are implied. Draft 0001 specifies a prototype baseline for buyer-accepted signed receipts and simulated settlement. Optimistic execution verification remains experimental and research is paused.</p>
     </header>
 
@@ -53,7 +53,7 @@
       <p>Begin with a known provider and human-approved spending limits. Permissionless participation is a separate hypothesis. A signature makes a claim attributable; it does not make the claim true. Add assurance research only when a specific unmet trust requirement justifies comparing it with ordinary delivery checks and provider audits.</p>
 
       <h3>Choose the workload with the buyer</h3>
-      <p>Start with one bounded workload that Fluxyard's existing Docker execution path supports. Open-model inference is a candidate when a buyer needs it: a specified model, a request, output tokens, measurable usage, and a price. No particular model family or new Runtime is a prerequisite.</p>
+      <p>Start with one bounded workload that fluxyard's existing Docker execution path supports. Open-model inference is a candidate when a buyer needs it: a specified model, a request, output tokens, measurable usage, and a price. No particular model family or new Runtime is a prerequisite.</p>
       <p>A useful pilot would justify improving that service. It would not establish demand for a broad marketplace or prove that decentralized verification is feasible.</p>
     </section>
 
@@ -70,7 +70,7 @@
       </ol>
 
       <h3>No privileged router</h3>
-      <p><a href="https://fluxyard.ai/">Fluxyard</a> may provide the first marketplace and gateway, but a buyer should be able to use another gateway or inspect offers directly. Signed objects carry the accepted terms across those choices. The draft still names trusted finalizers and settlement adapters; interchangeable clients do not by themselves make a deployment decentralized.</p>
+      <p><a href="https://fluxyard.ai/">fluxyard</a> may provide the first marketplace and gateway, but a buyer should be able to use another gateway or inspect offers directly. Signed objects carry the accepted terms across those choices. The draft still names trusted finalizers and settlement adapters; interchangeable clients do not by themselves make a deployment decentralized.</p>
       <figure class="protocol-diagram market-diagram" role="img" aria-labelledby="market-diagram-caption">
         <svg class="diagram-desktop" viewBox="0 0 960 390" aria-hidden="true" focusable="false">
           <defs>
@@ -88,7 +88,7 @@
           <path class="diagram-line diagram-arrow" d="M800 215V265" marker-end="url(#market-arrow-desktop)"></path>
 
           <rect class="diagram-node" x="40" y="270" width="240" height="88" rx="3"></rect>
-          <text class="diagram-title" x="160" y="307" text-anchor="middle">FLUXYARD</text>
+          <text class="diagram-title" x="160" y="307" text-anchor="middle">fluxyard</text>
           <text class="diagram-detail" x="160" y="333" text-anchor="middle">gateway + router</text>
 
           <rect class="diagram-node" x="360" y="270" width="240" height="88" rx="3"></rect>
@@ -117,7 +117,7 @@
           <path class="diagram-line diagram-arrow" d="M25 474H55" marker-end="url(#market-arrow-mobile)"></path>
 
           <rect class="diagram-node" x="55" y="170" width="285" height="88" rx="3"></rect>
-          <text class="diagram-title" x="197.5" y="207" text-anchor="middle">FLUXYARD</text>
+          <text class="diagram-title" x="197.5" y="207" text-anchor="middle">fluxyard</text>
           <text class="diagram-detail" x="197.5" y="233" text-anchor="middle">gateway + router</text>
 
           <rect class="diagram-node" x="55" y="300" width="285" height="88" rx="3"></rect>
@@ -128,7 +128,7 @@
           <text class="diagram-title" x="197.5" y="467" text-anchor="middle">AGENT B</text>
           <text class="diagram-detail" x="197.5" y="493" text-anchor="middle">direct buyer</text>
         </svg>
-        <figcaption id="market-diagram-caption">Proposed discovery topology. Providers expose offers to competing gateways and direct buyers; the lines show access to offers, not a central execution path. Fluxyard is one possible client.</figcaption>
+        <figcaption id="market-diagram-caption">Proposed discovery topology. Providers expose offers to competing gateways and direct buyers; the lines show access to offers, not a central execution path. fluxyard is one possible client.</figcaption>
       </figure>
       <p>Inference remains a direct buyer-to-provider interaction. The core standardizes identity, signed objects, replay handling, and outcomes; service profiles define the work and assurance profiles define the required evidence. A blockchain is not required to run the initial experiments. Settlement rails do not perform the computation.</p>
     </section>
@@ -238,18 +238,18 @@
     <section class="paper-section" id="roadmap" aria-labelledby="roadmap-title">
       <p class="section-label">04 / Practical pilot and decisions</p>
       <h2 id="roadmap-title">What would justify the next step?</h2>
-      <p><a href="https://fluxyard.ai/">Fluxyard</a> already has a trusted GPU-market transaction path: revisioned offers, immutable accepted terms, usage evidence, and append-only charges. Its control plane and database are trusted. Those patterns are a starting point for OpenInfer, not evidence of permissionless providers, independent verification, or decentralized settlement. The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/PROTOCOL.md#3-current-boundary">draft’s evidence map</a> makes that distinction explicit.</p>
+      <p><a href="https://fluxyard.ai/">fluxyard</a> already has a trusted GPU-market transaction path: revisioned offers, immutable accepted terms, usage evidence, and append-only charges. Its control plane and database are trusted. Those patterns are a starting point for OpenInfer, not evidence of permissionless providers, independent verification, or decentralized settlement. The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/PROTOCOL.md#3-current-boundary">draft’s evidence map</a> makes that distinction explicit.</p>
       <p>The next milestone is an agreed pilot with a real buyer and a known provider. Use existing capabilities first, adding portable signed records where they remove demonstrated coordination work. Existing <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/tests/protocol-cases.mjs">runnable examples</a> cover selected protocol cases; they do not establish buyer demand or complete conformance.</p>
 
       <h3>A four-week test with stop decisions</h3>
       <p>The <a href="https://github.com/Fluxyard-Inc/openinfer/blob/main/docs/RESEARCH.md">practical research plan</a> defines the evidence and gates. Before starting, name an owner and agree the spending cap, delivery criteria, data permissions, and acceptable cost and operator effort.</p>
       <ol class="experiment-list">
         <li><strong>Week 1 · Establish the need.</strong> Find one recurring workload, document the buyer's current alternative, and agree a price and measurable reason to switch. Pause the build if no credible buyer advantage emerges.</li>
-        <li><strong>Week 2 · Deliver one accountable job.</strong> Use the existing Fluxyard path. Obtain buyer acceptance, reconcile terms and usage, and exercise retry, restart, missing evidence, and provider failure without duplicate charges or silent evidence loss.</li>
+        <li><strong>Week 2 · Deliver one accountable job.</strong> Use the existing fluxyard path. Obtain buyer acceptance, reconcile terms and usage, and exercise retry, restart, missing evidence, and provider failure without duplicate charges or silent evidence loss.</li>
         <li><strong>Week 3 · Measure repeat use.</strong> Seek at least two further representative jobs on separate occasions. Include failures, subsidies, transfer, retries, audit costs, and operator labor. Simulated payments are not revenue or proof of willingness to pay.</li>
         <li><strong>Week 4 · Decide.</strong> Continue a useful service, timebox one measured fix, investigate one concrete trust gap, or pause/change the workload. A successful demo alone does not justify expanding the protocol.</li>
       </ol>
-      <p>OpenInfer settlement stays simulated; any commercial pilot requires separately approved ordinary billing and Fluxyard's operational gates. If a trust gap later warrants research, compare operator audits and existing reference-based methods before custom trace verification. Judge aggregate cost, false alarms, detection, and buyer exposure together. The former E0–E7 program is superseded and remains in Git history.</p>
+      <p>OpenInfer settlement stays simulated; any commercial pilot requires separately approved ordinary billing and fluxyard's operational gates. If a trust gap later warrants research, compare operator audits and existing reference-based methods before custom trace verification. Judge aggregate cost, false alarms, detection, and buyer exposure together. The former E0–E7 program is superseded and remains in Git history.</p>
 
       <h3 id="services-title">Beyond inference</h3>
       <p>If one service works, an agent could purchase data, computation, storage, or specialist work through the same transaction envelope. A research agent might buy a dataset, run an analysis, and commission an independent review, settling each contribution separately.</p>
@@ -373,7 +373,7 @@
   <footer>
     <a class="mark" href="#top"><span>O/I</span> OpenInfer</a>
     <p>An open protocol for the machine economy.</p>
-    <a href="https://fluxyard.ai/">Research by Fluxyard <span aria-hidden="true">↗</span></a>
+    <a href="https://fluxyard.ai/">Research by Fluxyard, Inc. <span aria-hidden="true">↗</span></a>
   </footer>
 </body>
 </html>

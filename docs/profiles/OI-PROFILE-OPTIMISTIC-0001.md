@@ -54,7 +54,7 @@ Passing sampled challenges does not prove that every unchallenged operation was 
 
 Every stride, count, and window field is a `PositiveUIntString`. `challenge_count` is a maximum audit budget and MUST be at most 1024. The provider MUST accept these parameters before execution. A gateway or verifier MUST NOT change them after the execution commitment is signed. The Agreement MUST satisfy `verification_deadline >= acceptance_deadline + challenge_window_seconds + opening_window_seconds + verdict_window_seconds`.
 
-`single-reference-verifier` is permitted only for laboratory and Fluxyard shadow stages and requires the named challenger and verifier to equal `settlement_policy.finalizer`. An open market requires a separately specified deterministic verifier or quorum policy.
+`single-reference-verifier` is permitted only for laboratory and fluxyard shadow stages and requires the named challenger and verifier to equal `settlement_policy.finalizer`. An open market requires a separately specified deterministic verifier or quorum policy.
 
 ## 4. Checkpoint object
 
@@ -378,6 +378,6 @@ This profile remains experimental until:
 2. predeclared aggregate cost and detection criteria are met on a named workload and hardware configuration, with a demonstrated benefit over simpler assurance methods;
 3. all required attacks have published results;
 4. economic modeling finds a conservative negative-fraud-value region;
-5. Fluxyard shadow mode survives replay, restart, timeout, and evidence gaps;
+5. fluxyard shadow mode survives replay, restart, timeout, and evidence gaps;
 6. two independently implemented verifiers agree on the same fixtures and live openings; and
 7. an external security review documents unresolved attacks.

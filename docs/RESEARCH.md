@@ -4,18 +4,18 @@ Status: proposed four-week pilot; no buyer demand, commercial viability, or veri
 
 ## Decision to make
 
-Can one buyer repeatedly obtain a useful machine service from one known provider through Fluxyard, with a clear advantage over their current approach and acceptable delivery, cost, and operator effort?
+Can one buyer repeatedly obtain a useful machine service from one known provider through fluxyard, with a clear advantage over their current approach and acceptable delivery, cost, and operator effort?
 
 The first outcome is a decision to continue, change the workload, or stop. Permissionless participation and decentralized verification are separate hypotheses, not requirements for this pilot. A working transaction does not establish demand for a marketplace or a new protocol.
 
 ## Operating scope
 
-- One buyer with a recurring need, one known provider, and one bounded workload supported by Fluxyard's existing Docker execution path. Choose batch open-model inference only if it answers that need; no particular model family is required.
+- One buyer with a recurring need, one known provider, and one bounded workload supported by fluxyard's existing Docker execution path. Choose batch open-model inference only if it answers that need; no particular model family is required.
 - One pilot owner accountable for buyer contact, delivery, costs, and the final decision. Record the buyer's acceptance contact and the provider's operations contact before starting.
 - A human approves the provider, price, workload limits, and total pilot spending cap. Software submits work within those bounds. No autonomous expansion of purchasing authority.
-- Fluxyard's Control Plane, database, operator, and selected provider remain trusted. Start with delivery checks, usage reconciliation, and direct problem resolution.
+- fluxyard's Control Plane, database, operator, and selected provider remain trusted. Start with delivery checks, usage reconciliation, and direct problem resolution.
 - Existing APIs, CLI, execution, and accounting paths first. Add only what blocks the selected transaction. A general gateway, new Runtime, heterogeneous scheduler, or full protocol implementation is not an entry requirement.
-- OpenInfer settlement remains simulated. Any commercial pilot uses separately approved ordinary billing and must satisfy Fluxyard's current operational and production gates. Test-mode payments and signed mock receipts do not demonstrate willingness to pay.
+- OpenInfer settlement remains simulated. Any commercial pilot uses separately approved ordinary billing and must satisfy fluxyard's current operational and production gates. Test-mode payments and signed mock receipts do not demonstrate willingness to pay.
 
 ## Week 1 — Establish a reason to use it
 
@@ -40,7 +40,7 @@ Run a supervised job through the existing Offer -> Job -> Allocation -> Worker r
 
 Use the existing signed-receipt examples to explore a portable transaction record where that removes real coordination work. A pilot record is not automatically OpenInfer-conformant. If implementing the [signed-receipt profile](profiles/OI-PROFILE-SIGNED-RECEIPT-0001.md), preserve all required validation and state transitions; keep its settlement simulated. Add cross-language fixtures when a second implementation needs to consume the objects.
 
-Before unattended retries or commercial delivery, reuse Fluxyard's existing checks and exercise the pilot's actual additions under duplicate submission, an unknown report outcome, restart, missing usage evidence, and provider failure. The result must remain traceable, without duplicate charges or silent evidence loss. A failure must have an explicit owner and disposition.
+Before unattended retries or commercial delivery, reuse fluxyard's existing checks and exercise the pilot's actual additions under duplicate submission, an unknown report outcome, restart, missing usage evidence, and provider failure. The result must remain traceable, without duplicate charges or silent evidence loss. A failure must have an explicit owner and disposition.
 
 **Gate:** the buyer accepts the output under the agreed criteria, the record reconciles to the accepted terms, and failures can be handled within the agreed effort limit. A successful internal demonstration alone does not pass this gate.
 

@@ -31,10 +31,10 @@ assert.match(html, /buyer-accepted signed receipts and simulated settlement/);
 assert.match(html, /Optimistic execution verification remains experimental/);
 for (const section of ['protocol', 'roadmap']) {
   const content = html.match(new RegExp(`<section[^>]+id="${section}"[\\s\\S]*?</section>`))?.[0];
-  assert.match(content, /<a href="https:\/\/fluxyard\.ai\/">Fluxyard<\/a>/, `${section} should link to Fluxyard`);
+  assert.match(content, /<a href="https:\/\/fluxyard\.ai\/">fluxyard<\/a>/, `${section} should link to fluxyard`);
 }
 const footer = html.match(/<footer>[\s\S]*?<\/footer>/)?.[0];
-assert.match(footer, /<p>An open protocol for the machine economy\.<\/p>\s*<a href="https:\/\/fluxyard\.ai\/">Research by Fluxyard/);
+assert.match(footer, /<p>An open protocol for the machine economy\.<\/p>\s*<a href="https:\/\/fluxyard\.ai\/">Research by Fluxyard, Inc\. <span/);
 assert.doesNotMatch(footer, /<br\b|href="#contents"/);
 assert.doesNotMatch(html, /Most transactions settle cheaply|optimistic-v2|Level [0-5]/);
 for (const variant of ['desktop', 'mobile']) {

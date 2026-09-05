@@ -1,6 +1,8 @@
 # OpenInfer
 
-A proposal for open machine-service transactions, starting with a practical pilot through Fluxyard.
+A proposal for open machine-service transactions, starting with a practical pilot through fluxyard.
+
+Naming: **fluxyard** is the product, platform, and public brand; **Fluxyard, Inc.** is the company. Use the company name for corporate and research attribution. Preserve repository names, URLs, and code identifiers.
 
 [openinfer.network](https://openinfer.network)
 

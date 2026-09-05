@@ -37,9 +37,9 @@ Service profiles define what was purchased and how delivery is measured. Assuran
 
 ## 3. Current boundary
 
-Fluxyard already implements a trusted GPU-market transaction spine. The first OpenInfer implementation should reuse its proven invariants without presenting centralized evidence as cryptographic proof.
+fluxyard already implements a trusted GPU-market transaction spine. The first OpenInfer implementation should reuse its proven invariants without presenting centralized evidence as cryptographic proof.
 
-| Fluxyard today | OpenInfer extension |
+| fluxyard today | OpenInfer extension |
 | --- | --- |
 | Revisioned offers and deterministic search | Signed offers that competing registries can index |
 | Immutable job request digests and idempotency keys | Signed requests and agreements with replay protection |
@@ -48,20 +48,20 @@ Fluxyard already implements a trusted GPU-market transaction spine. The first Op
 | Cumulative usage evidence and explicit gaps | Profile-defined metering and dispute outcomes |
 | Append-only charges and stable idempotency keys | Provider-independent settlement instructions |
 
-Fluxyard's control plane and database remain trusted. It does not yet provide permissionless identity, independent challengers, decentralized settlement, provider staking, or proof of model execution.
+fluxyard's control plane and database remain trusted. It does not yet provide permissionless identity, independent challengers, decentralized settlement, provider staking, or proof of model execution.
 
 ## 4. Implementation sequence
 
-Start with the [practical research plan](RESEARCH.md): establish a recurring buyer need, deliver through a known provider, and measure full cost and repeat use. Existing Fluxyard capabilities are sufficient to begin that investigation; implementing the entire draft is not an entry requirement.
+Start with the [practical research plan](RESEARCH.md): establish a recurring buyer need, deliver through a known provider, and measure full cost and repeat use. Existing fluxyard capabilities are sufficient to begin that investigation; implementing the entire draft is not an entry requirement.
 
 Where portable signed records remove demonstrated coordination work:
 
-1. Map the selected service's accepted terms, workload identity, delivery, and usage evidence onto Fluxyard's existing Offer-to-Charge path.
+1. Map the selected service's accepted terms, workload identity, delivery, and usage evidence onto fluxyard's existing Offer-to-Charge path.
 2. Implement and validate the complete required transaction path for the selected core, service, and signed-receipt profiles in shadow mode. A partial pilot record must not be described as protocol-conformant.
 3. Exercise restart, replay, timeout, and evidence-gap cases without duplicate effects or silent evidence loss.
 4. Add cross-language canonicalization, digest, and signature fixtures when a second implementation is needed; two interoperable implementations remain required for candidate maturity.
 
-OpenInfer settlement remains simulated. Commercial pilots require separately approved ordinary billing and Fluxyard's operational gates. Real stake, slashing, permissionless admission, and a native asset are outside this sequence. Optimistic verification requires a separate decision under the practical plan, not automatic progression from signed receipts.
+OpenInfer settlement remains simulated. Commercial pilots require separately approved ordinary billing and fluxyard's operational gates. Real stake, slashing, permissionless admission, and a native asset are outside this sequence. Optimistic verification requires a separate decision under the practical plan, not automatic progression from signed receipts.
 
 ## 5. Practical research gates
 
@@ -105,7 +105,7 @@ The changes add output/usage commitments and OpeningAcceptance, enforce one purc
 
 ## 8. Open questions
 
-- Which recurring workload gives a buyer a measurable reason to use Fluxyard?
+- Which recurring workload gives a buyer a measurable reason to use fluxyard?
 - Does repeat delivery remain worthwhile after accounting for failures and operator time?
 - Which coordination or trust problem requires additional protocol machinery?
 - Can the optimistic profile verify a useful checkpoint without loading most expert weights or request context?

@@ -10,7 +10,7 @@
 
 ## 1. Scope and trust
 
-This is the first laboratory/Fluxyard shadow assurance path. It establishes a provider-attributable result and buyer-checked delivery/usage. It does not establish faithful model execution. The buyer is trusted to acknowledge delivery honestly and operates the authoritative acceptance/finalization ledger. The mock adapter performs simulated accounting only; buyer withholding and finalizer collusion are not solved by this profile.
+This is the first laboratory/fluxyard shadow assurance path. It establishes a provider-attributable result and buyer-checked delivery/usage. It does not establish faithful model execution. The buyer is trusted to acknowledge delivery honestly and operates the authoritative acceptance/finalization ledger. The mock adapter performs simulated accounting only; buyer withholding and finalizer collusion are not solved by this profile.
 
 ## 2. Request and commitment
 
